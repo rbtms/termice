@@ -1,3 +1,9 @@
+/**
+* Query and parse radio-browser open radio directory
+* @module Radio
+**/
+'use strict'
+
 const request = require('request');
 
 
@@ -8,7 +14,14 @@ const mode_url = {
     language : 'http://www.radio-browser.info/webservice/json/stations/bylanguage/'
 };
 
-// search_radio :: String -> Promise
+/**
+* search_radio :: String -> Promise
+* @method search_radio
+* @description Search radio-browser.info for radio streams
+* @param {String} search Non-formatted query
+* @param {String} mode API Endpoint to query (name, tag, country, language)
+* @return {Promise} Stream list promise
+**/
 function search_radio(search, mode) {
     if(mode_url[mode] === undefined) return;
     
@@ -16,7 +29,7 @@ function search_radio(search, mode) {
     
     return new Promise( (resolve, reject) => {
         
-        var options = {
+        const options = {
             method : 'GET',
             url    : mode_url[mode]+search
         };
@@ -24,7 +37,7 @@ function search_radio(search, mode) {
         request(options, (err, res, body) => {
             if(err) reject(err);
             
-            var json = JSON.parse(body);
+            const json = JSON.parse(body);
             
             resolve( parse_radio(json) );
         });

@@ -5,12 +5,13 @@
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "pkg -t node8-win main.js"
   },
   "author": "",
   "license": "GPL-3.0",
   "dependencies": {
     "blessed": "^0.1.81",
+    "minimist": "^1.2.0",
     "request": "^2.83.0"
   },
   "devDependencies": {}

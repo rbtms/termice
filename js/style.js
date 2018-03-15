@@ -1,10 +1,12 @@
+'use strict'
+
 module.exports = {
     header: {
         top     : 0,
         left    : 1,
         width   : '98%',
         height  : 3,
-        content : '  {white-bg}{black-fg} Q {/} Exit '
+        content : '{white-bg}{black-fg} Q {/} Exit '
                   + '{white-bg}{black-fg} Esc {/} Search '
                   + '{white-bg}{black-fg} I {/} Icecast '
                   + '{white-bg}{black-fg} S {/} Shoutcast '
@@ -13,6 +15,10 @@ module.exports = {
                   + '{white-bg}{black-fg} Sp {/} Pause '
                   + '{white-bg}{black-fg} K {/} Stop',
         tags    : true,
+        
+        padding: {
+            left: 2
+        },
         
         border: {
             type: 'line'

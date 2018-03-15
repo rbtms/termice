@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: main.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: main.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+* @fileOverview main.js
+* @author      nishinishi9999 (Alvaro Fernandez) {@link https://github.com/nishinishi9999}
+* @version     0.1.0
+* @description Simple terminal net stream player
+* @example
+* test
+* @license
+* Copyright (c) 2018 Alvaro Fernandez
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see {@link https://www.gnu.org/licenses/}.
+*
+*
+* @todo TESTING     | Go to the last index when pressing up in the first index
+* @todo TESTING     | Fix set_title inside set_header
+* @todo IN PROGRESS | Catch errors
+* @todo IN PROGRESS | Test
+*
+* @todo ERROR | Cache loop errors
+* @todo ERROR | Remove layout-breaking characters
+* @todo TODO  | Check terminal type to decide whether to use mplayer or mplayer.exe
+* @todo TODO  | Check whether mplayer is installed
+**/
+'use strict';
+
+const blessed  = require('blessed');
+const jsonfile = require('jsonfile');
+
+const argv    = require('minimist')(process.argv);
+
+const mplayer = require('./js/mplayer.js');
+const icecast = require('./js/icecast.js');
+const radio   = require('./js/radio.js');
+
+const style   = require('./js/style.js');
+
+
+/**
+* Ideas
+*
+* Update currently playing track information
+* Modularization
+* Add currently playing bar
+* Update frequently
+*
+* Add podcasts
+* Add free music sources
+**/
+
+
+// Constants
+var config;
+
+try { config = jsonfile.readFileSync('./config.json'); }
+catch(err) { throw 'Couldn\'t load config.json: ' + err; }
+
+// Prevent properties from being modified
+Object.freeze(config);
+
+
+const s = blessed.screen({
+    smartCSR: true,
+    autoPadding: true,
+    fullUnicode: true,
+    //warnings: true,
+    //forceUnicode: true,
+    dump: './log.txt',
+    debug: true
+});
+
+const header       = blessed.listbar(style.header);
+const stream_table = blessed.listtable(style.stream_table);
+const input        = blessed.textarea(style.input);
+const loading      = blessed.loading(style.input);
+
+
+// Global variables
+var LAST_SEARCH   = argv.q || config.default_search;
+var SOURCE        = argv.s || config.default_source;
+var LAST_ENTRY    = {};
+var CURRENT_INDEX = 0;
+
+var stream_list   = [];
+
+// Global flags
+var IS_PLAYING = false;
+var IS_PAUSED  = false;
+var IS_INPUT   = false;
+
+
+/**
+* exit :: IO()
+* @description Stop the player and exit
+**/
+function exit() {
+    //mplayer.kill( () => {
+    mplayer.stop( () => {
+        process.exit(0);
+    });
+}
+
+/**
+* stop :: IO()
+* @description Stop the player
+**/
+function stop() {
+    mplayer.stop(() => {
+        IS_PLAYING = false;
+        
+        // Update title
+        set_title(SOURCE);
+    });
+}
+
+/**
+* pause :: IO()
+* @description Pause/Resume the player
+**/
+function pause() {
+    mplayer.pause(() => {
+        IS_PAUSED = !IS_PAUSED;
+        
+        // Update pause key text
+        set_header(SOURCE);
+        set_title(SOURCE);
+    });
+}
+
+/**
+* usage :: String
+* @description Returns usage
+**/
+function usage() {
+    return `
+Usage: netstreams [ARGS]
+
+Arguments:
+  -q: Query
+  -s: Source
+`;
+}
+
+/**
+* format_header :: String -> JSON -> String -> Bool -> String
+* @description Format header line
+* @param {String} tab       Current tab
+* @param {JSON}   options   Option key-value pairs
+* @param {String} pause_key Header key text of the pause key
+* @param {Bool}   is_paused Whether the player is currently paused or not
+* @return {String} Formatted header line
+**/
+function format_header(tab, option, pause_key, is_paused) {
+    const def_style = '{white-bg}{black-fg}'; // Default style
+    const sel_style = '{green-bg}{black-fg}'; // Selected style
+    const pad = ' ';
+    
+    option[pause_key] = is_paused ? 'Pause' : 'Resume';
+    
+    
+    var line = '';
+    var style;
+
+    for(var key in option) {
+        style = key == tab ? sel_style : def_style;
+        
+        line += `${style} ${key} {/} ${option[key]}${pad}`;
+    }
+    
+    
+    // Remove last space
+    return line.substr(0, line.length-1);
+}
+
+/**
+* set_header :: String -> IO()
+* @description Set current tab in the header
+* @param {String} tab Current tab
+**/
+function set_header(tab) {
+    var line = format_header(
+        tab,
+        config.header,
+        config.pause_key,
+        IS_PAUSED
+    );
+    
+    header.setContent(line);
+    s.render();
+}
+
+/**
+* format_title :: String -> String -> String
+* @description Format the title line
+* @param {String} src  Current source
+* @param {String} name Entry name
+* @return {String} Title line
+**/
+function format_title(src, name) {
+    if(name) name = ` | ${name}`;
+    
+    return `Net streams - ${src}${name}`;
+}
+
+/**
+* set_title :: String -> String? -> IO()
+* @description Set window title
+* @param {String} src  Current source
+* @param {String} name Entry name
+**/
+function set_title(src, name) {
+    // Keep the old title if it's playing
+    if(IS_PLAYING) return;
+
+    s.title = name === undefined
+        ? format_title(src, '')
+        : format_title(src, name);
+}
+
+/**
+* display_rows :: [JSON] -> IO()
+* @description Display &lt;rows> in stream_table
+* @param {Array} Array of JSON entries
+**/
+function display_rows(rows) {
+    stream_table.setData(rows);
+    s.render();
+}
+
+/**
+* query_streams :: String -> String -> Promise
+* @description Get streams from &lt;src> and display them
+* @param {String} search Search query
+* @param {String} src    Stream source
+* @return {Promise} Query promise
+**/
+function query_streams(search, src) {
+    var p = '';
+    
+    
+    switch(src) {
+        case 'Icecast': {
+            p = icecast.search_xiph(search);
+            break;
+        }
+        case 'Shoutcast': {
+            p = icecast.search_shoutcast(search);
+            break;
+        }
+        case 'Radio': {
+            // Parse mode
+            var mode;
+            
+            const match = search.match(/^(.+?):(.+)$/);
+            switch(!!match) {
+                // There is a match
+                case true: {
+                    switch(match[1]) {
+                        // It's a valid mode
+                        case 'name':
+                        case 'tag':
+                        case 'country':
+                        case 'language': {
+                            mode   = match[1];
+                            search = match[2];
+                            break;
+                        }
+                        // It isn't a valid mode
+                        default: {
+                            mode = 'name';
+                        }
+                    }
+                    
+                    break;
+                }
+                // There is not a match
+                default: {
+                    mode = 'name';
+                }
+            }
+            
+            p = radio.search(search, mode);
+            break;
+        }
+        default: {
+            throw 'Source not recognized: ' + src;
+        }
+    }
+    
+    
+    return p;
+}
+
+
+/**
+* format_stream_list :: [JSON] -> String -> [JSON]
+* @description Get streams from &lt;src>
+* @param {Array}  list Entry list
+* @param {String} src  Stream source
+* @return {Array} Array of JSON Entries
+**/
+function format_stream_list(list, rows, search, src) {
+    const pad = '  ';
+    const is_icecast = (src == 'Icecast' || src == 'Shoutcast');
+    
+    if(list.length > 0) {
+        for(var i = 0; i &lt; list.length; i++) {
+            var entry;
+            
+            if(src === 'Icecast' || src === 'Shoutcast') {
+                entry = [
+                    list[i].name.substr(0, 30),
+                    list[i].playing.substr(0, 50),
+                    //list[i].description.substr(0, 50),
+                    list[i].listeners.substr(0, 20)
+                ];
+            }
+            else if(src === 'Radio') {
+                entry = [
+                    list[i].name.substr(0, 50),
+                    '   '.substr(list[i].bitrate.length) + list[i].bitrate + ' kbps'
+                ];
+            }
+            else {
+                throw 'Unknown source: ' + src;
+            }
+            
+            
+            rows.push(entry);
+        }
+    }
+    else {
+        rows.push(['No results for: ' + search]);
+    }
+    
+    
+    // Add left padding
+    return rows.map( (arr) =>
+        arr.map( (cell) => pad + cell )
+    );
+}
+
+/**
+* search_streams :: String -> String -> IO()
+* @description Query source and display results
+* @param {String} search Unformatted query string
+* @param {String} src    Streams source
+**/
+function search_streams(search, src) {
+    s.debug('Searching: ', search);
+    loading.load('Searching: ' + search);
+    
+    // Update global variables
+    LAST_SEARCH   = search;
+    CURRENT_INDEX = 0;
+    
+    
+    query_streams(search, src).then( (list) => {
+        // Update current stream list for events
+        stream_list = list;
+        
+        // Process the list and display it
+        const rows = format_stream_list(
+            list,
+            [config.table_headers[src].slice()],
+            search,
+            src
+        );
+        display_rows(rows);
+            
+        loading.stop();
+        
+        set_header(src);
+        set_title(src);
+    } )
+    .catch( (err) => { s.debug('Error: ' + err); });
+}
+
+/**
+* refresh_table :: IO()
+* @description Refresh table with last query
+**/
+function refresh_table() {
+    search_streams(LAST_SEARCH, SOURCE);
+}
+
+/**
+* play_url :: String -> IO()
+* @description Play a url with mplayer
+* @param {JSON} entry Table entry
+**/
+function play_url(entry) {
+    LAST_ENTRY = entry;
+    
+    mplayer.play(entry.url, entry.is_playlist, () => {
+        IS_PLAYING = false;
+        IS_PAUSED  = false;
+        
+        set_header(entry.src);
+        set_title(entry.src, entry.name);
+        
+        IS_PLAYING = true;
+    });
+}
+
+/**
+* toggle_input :: String -> IO()
+* @description Toggle the input textarea
+**/
+function toggle_input() {
+    s.debug('toggle');
+    
+    // Toggle input
+    input.toggle();
+    s.render();
+    
+    // Enable input
+    if(!IS_INPUT) input.input();
+    
+    // Change tab
+    const tab = IS_INPUT ? SOURCE : 'Search';
+    set_header(tab);
+    set_title(tab);
+    
+    
+    IS_INPUT = !IS_INPUT;
+}
+
+/**
+* set_events :: IO()
+* @description Set events
+**/
+function set_events() {
+    // Screen events
+    s.key([ config.keys.screen.quit     ], exit);
+    s.key([ config.keys.screen.input    ], toggle_input);
+    s.key([ config.keys.screen.pause    ], pause);
+    s.key([ config.keys.screen.stop     ], stop);
+    s.key([ config.keys.screen.vol_up   ], () => mplayer.volume('+1'));
+    s.key([ config.keys.screen.vol_down ], () => mplayer.volume('-1'));
+    
+    // Icecast tab
+    s.key( config.keys.screen.icecast, () => {
+        SOURCE = 'Icecast';
+        refresh_table();
+    });
+    
+    // Shoutcast tab
+    s.key( config.keys.screen.shoutcast, () => {
+        SOURCE = 'Shoutcast';
+        refresh_table();
+    });
+    
+    // Radio tab
+    s.key( config.keys.screen.radio, () => {
+        SOURCE = 'Radio';
+        refresh_table();
+    });
+    
+    // Refresh table
+    s.key( config.keys.screen.refresh, () => {
+        refresh_table();
+    });
+    
+    
+    // Stream table events
+    stream_table.on('select', (e, i) => {
+        const entry = stream_list[i-1];
+        play_url(entry);
+        
+        s.debug('Playing: ', entry.url);
+    });
+    
+    // Arrow keys
+    stream_table.key( config.keys.stream_table.up, () => {
+        if(CURRENT_INDEX === 0) {
+            // Select last index
+            // Note: Up key event is triggered after the end of this function,
+            //       because of that the index is stream_list.length and not
+            //       stream_list.length-1
+            
+            CURRENT_INDEX = stream_list.length-1;
+            stream_table.select(CURRENT_INDEX+1);
+        }
+        else {
+            CURRENT_INDEX--;
+        }
+        
+        s.debug(CURRENT_INDEX);
+    });
+    stream_table.key( config.keys.stream_table.down, () => {
+        if(stream_list.length-1 == CURRENT_INDEX) {
+            // Select first index
+            CURRENT_INDEX = 0;
+            stream_table.select(CURRENT_INDEX);
+        }
+        else {
+            CURRENT_INDEX++;
+        }
+        
+        s.debug(CURRENT_INDEX);
+    });
+    
+    // Input form events
+    input.key('enter', () => {
+        const str = input.getText().trim();
+        input.clearValue();
+        
+        search_streams(str, SOURCE);
+        
+        toggle_input();
+    });
+}
+
+// main :: IO()
+function main() {
+    if(argv.h) {
+        console.log( usage() );
+        process.exit();
+    }
+    
+    // Initialize
+    set_events();
+    
+    s.append(header);
+    s.append(stream_table);
+    s.append(input);
+    s.append(loading);
+    
+    stream_table.focus();
+    s.render();
+    
+    search_streams(LAST_SEARCH, SOURCE);
+}
+
+
+main();</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Icecast.html">Icecast</a></li><li><a href="module-Mplayer.html">Mplayer</a></li><li><a href="module-Radio.html">Radio</a></li></ul><h3>Global</h3><ul><li><a href="global.html#config">config</a></li><li><a href="global.html#display_rows">display_rows</a></li><li><a href="global.html#exit">exit</a></li><li><a href="global.html#format_header">format_header</a></li><li><a href="global.html#format_stream_list">format_stream_list</a></li><li><a href="global.html#format_title">format_title</a></li><li><a href="global.html#pause">pause</a></li><li><a href="global.html#play_url">play_url</a></li><li><a href="global.html#query_streams">query_streams</a></li><li><a href="global.html#refresh_table">refresh_table</a></li><li><a href="global.html#search_streams">search_streams</a></li><li><a href="global.html#set_events">set_events</a></li><li><a href="global.html#set_header">set_header</a></li><li><a href="global.html#set_title">set_title</a></li><li><a href="global.html#stop">stop</a></li><li><a href="global.html#toggle_input">toggle_input</a></li><li><a href="global.html#usage">usage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Mar 15 2018 19:35:11 GMT+0200 (Hora de verano romance)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

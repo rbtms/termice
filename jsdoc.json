@@ -1,0 +1,11 @@
+{
+    "source": {
+        "include": [
+            "main.js",
+            
+            "js/mplayer.js",
+            "js/icecast.js",
+            "js/radio.js"
+        ]
+    }
+}
