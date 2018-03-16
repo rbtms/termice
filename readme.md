@@ -2,7 +2,6 @@
 Simple terminal net stream player
 
 # usage
-----
 
     netstreams [ARGS]
 
@@ -10,7 +9,6 @@ Simple terminal net stream player
       -q: Query
       -s: Source
 
-----
 # Install
 
 # Bugs
