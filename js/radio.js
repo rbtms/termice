@@ -2,7 +2,7 @@
 * Query and parse radio-browser open radio directory
 * @module Radio
 **/
-'use strict'
+'use strict';
 
 const request = require('request');
 
@@ -67,4 +67,4 @@ function parse_radio(json) {
 
 module.exports = {
     search: search_radio
-}
+};

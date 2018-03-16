@@ -1,4 +1,34 @@
-'use strict'
+'use strict';
+
+const jsonfile = require('jsonfile');
+
+
+// Constants
+var config;
+
+try { config = jsonfile.readFileSync('./config.json'); }
+catch(err) { throw 'Couldn\'t load config.json: ' + err; }
+
+// Prevent properties from being modified
+Object.freeze(config);
+
+
+// format_header :: String
+function format_header(option) {
+    const def_style = '{white-bg}{black-fg}';
+    const pad = ' ';
+    
+    var line = '';
+
+    for(var key in option) {
+        line += `${def_style} ${key} {/} ${option[key]}${pad}`;
+    }
+    
+    
+    // Remove last space
+    return line.substr(0, line.length-1);
+}
+
 
 module.exports = {
     header: {
@@ -6,14 +36,7 @@ module.exports = {
         left    : 1,
         width   : '98%',
         height  : 3,
-        content : '{white-bg}{black-fg} Q {/} Exit '
-                  + '{white-bg}{black-fg} Esc {/} Search '
-                  + '{white-bg}{black-fg} I {/} Icecast '
-                  + '{white-bg}{black-fg} S {/} Shoutcast '
-                  + '{white-bg}{black-fg} R {/} Radio '
-                  + '{white-bg}{black-fg} P {/} Refresh '
-                  + '{white-bg}{black-fg} Sp {/} Pause '
-                  + '{white-bg}{black-fg} K {/} Stop',
+        content : format_header(config.header),
         tags    : true,
         
         padding: {
@@ -50,6 +73,12 @@ module.exports = {
         border: {
             type: 'line'
         },
+        
+        /*
+        padding: {
+            left: 2
+        },
+        */
         
         style: {
             fg : 'white',
@@ -101,4 +130,4 @@ module.exports = {
             bg : 'white'
         }
     }
-}
+};

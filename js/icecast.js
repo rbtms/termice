@@ -2,7 +2,7 @@
 * Query and parse Icecast and Shoutcast directories
 * @module Icecast
 **/
-'use strict'
+'use strict';
 
 const request = require('request');
 
@@ -22,7 +22,7 @@ function search_xiph(search) {
         const options = {
             method : 'GET',
             url    : 'http://dir.xiph.org/search?search='+search
-        }
+        };
         
         request(options, (err, res, body) => {
             if(err) reject(err);
@@ -51,7 +51,7 @@ function search_shoutcast(search) {
             formData : {
                 query: search
             }
-        }
+        };
         
         request(options, (err, res, body) => {
             if(err) reject(err);
@@ -66,7 +66,7 @@ function search_shoutcast(search) {
 // parse_xiph :: String -> [JSON]
 function parse_xiph(body) {
     var stream_list = [];
-    var host, homepage, name, listeners, description, playing, url;
+    var host, listeners, description, playing, url;
     
     body = body.replace(/\n/g, '');
     
@@ -76,7 +76,7 @@ function parse_xiph(body) {
     for(var i = 0; i < rows.length; i++) {
         host = 'http://dir.xiph.org';
         
-        [undefined, homepage, name] = rows[i].match(/<span class="name"><a href="(.+?)" onclick=".+?">(.+?)<\/a>/);
+        var [, homepage, name] = rows[i].match(/<span class="name"><a href="(.+?)" onclick=".+?">(.+?)<\/a>/);
         
         listeners   = rows[i].match(/<span class="listeners">\[(\d+).+?<\/span>/);
         description = rows[i].match(/<p class="stream-description">(.+?)<\/p>/);
@@ -128,4 +128,4 @@ function parse_shoutcast(json) {
 module.exports = {
     search_xiph      : search_xiph,
     search_shoutcast : search_shoutcast
-}
+};

@@ -1,11 +1,15 @@
 {
-  "name": "term_player",
-  "version": "0.0.1",
-  "description": "",
+  "name": "netstreams",
+  "author": "nishinishi9999 (Alvaro Fernandez)",
+  "version": "0.1.0",
+  "description": "Simple terminal net stream player",
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
-    "build": "pkg -t node8-win main.js"
+    "test": "mocha test/test.js",
+    "build": "pkg -t node8-win main.js",
+    "doc": "jsdoc -r -c jsdoc.json -d doc",
+    "lint": "jshint -c .jshintrc main.js js/"
   },
   "author": "",
   "license": "GPL-3.0",

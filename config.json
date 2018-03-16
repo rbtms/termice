@@ -1,6 +1,6 @@
 {
     "default_search": "anime",
-    "default_source": "Shoutcast",
+    "default_source": "Radio",
     
     "pause_key": "Sp",
 
@@ -41,7 +41,8 @@
     },
     
     "mplayer": {
-        "cache": "1024",
-        "path": "mplayer"
+        "cache": "2048",
+        "path": "mplayer",
+        "wait_io": 100
     }
 }
