@@ -3,18 +3,20 @@ Simple terminal net stream player
 
 # usage
 netstreams [ARGS]
+----
 
-Options:
-  -q: Query
-  -s: Source
+    Options:
+      -q: Query
+      -s: Source
 
+----
 # Install
 
 # Bugs
 - Currently very slow on huge stream lists
 
 # Configuration
-<br>Currently, netstreams relies on Mplayer in order to work.
+Currently, netstreams relies on Mplayer in order to work.
 <br>By defect, it looks on the bin folder for an executable file and falls back on the 'mplayer' command.
 <br>It is untested in other OS other than Windows so input about other systems would be apreciated.
 
