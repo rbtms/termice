@@ -2,13 +2,12 @@
 Simple terminal net stream player
 
 # usage
-netstreams [ARGS]
 ----
+netstreams [ARGS]
 
     Options:
       -q: Query
       -s: Source
-
 ----
 # Install
 
