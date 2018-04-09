@@ -4,10 +4,10 @@ Simple terminal net stream player
 # Description
 
 # Install
-Netstreams is a nodejs program, so it needs the nodejs runtime in order to work.
+Netstreams is made with Nodejs, so it needs the Nodejs runtime in order to work.
 
-Download the repository somewhere you are comfortable 
-It's better to create an alias on .bashrc if you are on linux/cygwin
+Download the repository somewhere you are comfortable.<br>
+It's better to create an alias on .bashrc if you are on linux/cygwin.
 
 # Usage
 
