@@ -1,41 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>JSDoc: Source: main.js</title>
-
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
-</head>
-
-<body>
-
-<div id="main">
-
-    <h1 class="page-title">Source: main.js</h1>
-
-    
-
-
-
-    
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>"use strict";
-var __importStar = (this &amp;&amp; this.__importStar) || function (mod) {
-    if (mod &amp;&amp; mod.__esModule) return mod;
+"use strict";
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
     var result = {};
     if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
     result["default"] = mod;
     return result;
 }
-var __importDefault = (this &amp;&amp; this.__importDefault) || function (mod) {
-    return (mod &amp;&amp; mod.__esModule) ? mod : { "default": mod };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -59,27 +31,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 * along with this program.  If not, see {@link https://www.gnu.org/licenses/}.
 *
 *
-* @todo TESTING | Go to the last index when pressing up in the first index
-* @todo TESTING | Fix set_title inside set_header
+* TESTING
+* @todo Go to the last index when pressing up in the first index
+* @todo Fix set_title inside set_header
 *
-* @todo IN PROGRESS | Catch errors
-* @todo IN PROGRESS | Test file
+* IN PROGRESS
+* @todo Catch errors
+* @todo Test file
 *
-* @todo ERROR | Cache loop errors
-* @todo ERROR | Remove layout-breaking characters
+* ERROR
+* @todo Cache loop errors
+* @todo Remove layout-breaking characters
 *
-* @todo TODO | Check terminal type to decide whether to use mplayer or mplayer.exe
-* @todo TODO | Check whether mplayer is installed
-* @todo TODO | Volume bar
+* TODO
+* @todo Reduce startup and quit overhead
+* @todo Check terminal type to decide whether to use mplayer or mplayer.exe
+* @todo Check whether mplayer is installed
+* @todo Volume bar
 **/
 const Blessed = __importStar(require("blessed"));
 const minimist_1 = __importDefault(require("minimist"));
-const Util = __importStar(require("./lib/util.js"));
-const Mplayer = __importStar(require("./lib/mplayer.js"));
-const Icecast = __importStar(require("./lib/icecast.js"));
+const Util = __importStar(require("./lib/util"));
+const Mplayer = __importStar(require("./lib/mplayer"));
+const Icecast = __importStar(require("./lib/icecast"));
 const Radio = __importStar(require("./lib/radio.js"));
 const Style = __importStar(require("./lib/style.js"));
-const argv = minimist_1.default(process.argv);
+const ARGV = minimist_1.default(process.argv);
 /**
 * Ideas
 *
@@ -92,8 +69,8 @@ const argv = minimist_1.default(process.argv);
 * Add free music sources
 **/
 // Constants
-const config = Util.read_config('./config.json');
-const s = Blessed.screen({
+const CONFIG = Util.read_config('./config.json');
+const S = Blessed.screen({
     autoPadding: true,
     debug: true,
     dump: './log.txt',
@@ -101,13 +78,15 @@ const s = Blessed.screen({
     //forceUnicode: true,
     smartCSR: true,
 });
-const header = Blessed.listbar(Style.style.header);
-const stream_table = Blessed.listtable(Style.style.stream_table);
-const input = Blessed.textarea(Style.style.input);
-const loading = Blessed.loading(Style.style.loading);
+const COMP = {
+    header: Blessed.listbar(Style.style.header),
+    stream_table: Blessed.listtable(Style.style.stream_table),
+    input: Blessed.textarea(Style.style.input),
+    loading: Blessed.loading(Style.style.loading)
+};
 // Global variables
-let LAST_SEARCH = argv.q || config.default_search;
-let SOURCE = argv.s || config.default_source;
+let LAST_SEARCH = ARGV.q || CONFIG.default_search;
+let SOURCE = ARGV.s || CONFIG.default_source;
 let CURRENT_INDEX = 0;
 let STREAM_LIST = [];
 // Global flags
@@ -119,7 +98,7 @@ let IS_INPUT = false;
 **/
 function exit(line) {
     Mplayer.quit(() => {
-        s.destroy();
+        S.destroy();
         if (line)
             throw Error(line);
         process.exit();
@@ -147,7 +126,6 @@ function pause() {
     });
 }
 /**
-* usage :: String
 * @description Returns usage
 **/
 function usage() {
@@ -171,15 +149,12 @@ function format_header(tab, option, pause_key, is_paused) {
     const def_style = '{white-bg}{black-fg}'; // Default style
     const sel_style = '{green-bg}{black-fg}'; // Selected style
     const pad = ' ';
-    let letter;
-    let text;
-    let style;
     const line = Object.keys(option).reduce((acc, key) => {
-        letter = key;
-        text = option[key];
+        let letter = key;
+        let text = option[key];
         if (letter === pause_key)
             text = !is_paused ? 'Pause' : 'Resume';
-        style = text === tab ? sel_style : def_style;
+        let style = text === tab ? sel_style : def_style;
         return acc + ` ${style} ${letter} {/} ${text}${pad}`;
     }, '');
     // Remove last space
@@ -190,9 +165,9 @@ function format_header(tab, option, pause_key, is_paused) {
 * @param tab Current tab
 **/
 function set_header(tab) {
-    const line = format_header(tab, config.header, config.pause_key, IS_PAUSED);
-    header.setContent(line);
-    s.render();
+    const line = format_header(tab, CONFIG.header, CONFIG.pause_key, IS_PAUSED);
+    COMP.header.setContent(line);
+    S.render();
 }
 /**
 * @description Format the window title line
@@ -212,18 +187,17 @@ function set_title(src, name) {
     // Keep the old title if it's playing
     if (IS_PLAYING)
         return;
-    s.title = name === undefined
+    S.title = name === undefined
         ? format_title(src, '')
         : format_title(src, name);
 }
 /**
-* display_rows :: [JSON] -> IO()
-* @description Display &lt;rows> in stream_table
+* @description Display <rows> in stream_table
 * @param Array of formatted rows
 **/
 function display_rows(rows) {
-    stream_table.setData(rows);
-    s.render();
+    COMP.stream_table.setData(rows);
+    S.render();
 }
 /**
 * @description Get query function
@@ -256,7 +230,7 @@ function query_streams(search, src) {
                         }
                         // It isn't a valid mode
                         default: {
-                            s.debug('Mode not recognized: ' + mode);
+                            S.debug('Mode not recognized: ' + mode);
                             return query_streams(LAST_SEARCH, SOURCE);
                         }
                     }
@@ -268,15 +242,27 @@ function query_streams(search, src) {
             }
         }
         default: {
-            s.debug('Source not recognized: ' + src);
+            S.debug('Source not recognized: ' + src);
             return query_streams(LAST_SEARCH, SOURCE);
         }
     }
 }
+/**
+* @description Add left padding to stream_table cells
+* @param rows_header Header
+* @param rows        Table rows
+* @return Padded table rows
+**/
 function add_rows_padding(rows_header, rows) {
     const pad = '  ';
     return [rows_header].concat(rows).map((arr) => arr.map((cell) => pad + cell));
 }
+/**
+* @description Format icecast entries into stream_table rows
+* @param rows_header Header
+* @param list        Icecast entry list
+* @return Formatted table rows
+**/
 function icecast_list(rows_header, list) {
     const char_limit = {
         name: 30,
@@ -284,13 +270,10 @@ function icecast_list(rows_header, list) {
         description: 50,
         listeners: 20
     };
-    let playing;
-    let listeners;
-    //let description :string;
     return add_rows_padding(rows_header, list.map((entry) => {
-        playing = entry.playing || 'Null';
-        listeners = entry.listeners || 'Null';
-        //description = entry.description || 'Null';
+        const playing = entry.playing || '';
+        const listeners = entry.listeners || 'Null';
+        //const description = entry.description || 'Null';
         return [
             entry.name.substr(0, char_limit.name),
             playing.substr(0, char_limit.playing),
@@ -299,16 +282,20 @@ function icecast_list(rows_header, list) {
         ];
     }));
 }
+/**
+* @description Format radio entries into stream_table rows
+* @param rows_header Header
+* @param list        Radio entry list
+* @return Formatted table rows
+**/
 function radio_list(rows_header, list) {
     const bitrate_pad = '   ';
     const char_limit = {
         name: 50
     };
-    let bitrate;
-    let pad;
     return add_rows_padding(rows_header, list.map((entry) => {
-        bitrate = entry.bitrate || 'Null';
-        pad = bitrate_pad.substr(bitrate.length);
+        const bitrate = entry.bitrate || 'Null';
+        const pad = bitrate_pad.substr(bitrate.length);
         return [
             entry.name.substr(0, char_limit.name),
             `${pad}${bitrate} kbps`
@@ -316,7 +303,7 @@ function radio_list(rows_header, list) {
     }));
 }
 /**
-* @description Get streams from &lt;src>
+* @description Get streams from <src>
 * @param list        Entry list
 * @param rows_header Rows header
 * @param search      Query search
@@ -342,14 +329,13 @@ function format_stream_list(list, rows_header, search) {
     }
 }
 /**
-* search_streams :: String -> String -> IO()
 * @description Query source and display results
 * @param search Unformatted query string
 * @param src    Streams source
 **/
 function search_streams(search, src) {
-    s.debug('Searching: ', search);
-    loading.load('Searching: ' + search);
+    S.debug('Searching: ', search);
+    COMP.loading.load('Searching: ' + search);
     // Update global variables
     LAST_SEARCH = search;
     CURRENT_INDEX = 0;
@@ -357,16 +343,16 @@ function search_streams(search, src) {
         // Update current stream list for events
         STREAM_LIST = list;
         // Process the list and display it
-        const rows = format_stream_list(list, config.table_headers[src], search);
+        const rows = format_stream_list(list, CONFIG.table_headers[src], search);
         //// Show an error message on false
         if (rows !== false) {
             display_rows(rows);
-            loading.stop();
+            COMP.loading.stop();
             set_header(src);
             set_title(src);
         }
     })
-        .catch((err) => { s.debug('Error: ' + err); });
+        .catch((err) => { S.debug('Error: ' + err); });
 }
 /**
 * @description Refresh table with last query
@@ -391,13 +377,13 @@ function play_url(entry) {
 * @description Toggle the input textarea
 **/
 function toggle_input() {
-    s.debug('toggle');
+    S.debug('toggle');
     // Toggle input
-    input.toggle();
-    s.render();
+    COMP.input.toggle();
+    S.render();
     // Enable input
     if (!IS_INPUT)
-        input.input();
+        COMP.input.input();
     // Change tab
     const tab = IS_INPUT ? SOURCE : 'Search';
     set_header(tab);
@@ -409,7 +395,7 @@ function input_handler(str) {
         exit();
     }
     else {
-        input.clearValue();
+        COMP.input.clearValue();
         search_streams(str, SOURCE);
         toggle_input();
     }
@@ -419,66 +405,68 @@ function input_handler(str) {
 **/
 function set_events() {
     // Screen events
-    s.key([config.keys.screen.quit], () => exit());
-    s.key([config.keys.screen.input], () => toggle_input);
-    s.key([config.keys.screen.pause], () => pause());
-    s.key([config.keys.screen.stop], () => stop());
-    s.key([config.keys.screen.vol_up], () => Mplayer.volume('+1'));
-    s.key([config.keys.screen.vol_down], () => Mplayer.volume('-1'));
+    S.key([CONFIG.keys.screen.quit], (_) => exit()); // Discard arguments
+    S.key([CONFIG.keys.screen.pause], (_) => pause());
+    S.key([CONFIG.keys.screen.stop], (_) => stop());
+    S.key([CONFIG.keys.screen.input], toggle_input);
+    S.key([CONFIG.keys.screen.vol_up], () => Mplayer.volume('+1'));
+    S.key([CONFIG.keys.screen.vol_down], () => Mplayer.volume('-1'));
     // Icecast tab
-    s.key(config.keys.screen.icecast, () => {
+    S.key(CONFIG.keys.screen.icecast, () => {
         SOURCE = 'Icecast';
         refresh_table();
     });
     // Shoutcast tab
-    s.key(config.keys.screen.shoutcast, () => {
+    S.key(CONFIG.keys.screen.shoutcast, () => {
         SOURCE = 'Shoutcast';
         refresh_table();
     });
     // Radio tab
-    s.key(config.keys.screen.radio, () => {
+    S.key(CONFIG.keys.screen.radio, () => {
         SOURCE = 'Radio';
         refresh_table();
     });
     // Refresh table
-    s.key(config.keys.screen.refresh, () => {
+    S.key(CONFIG.keys.screen.refresh, () => {
         refresh_table();
     });
     // Stream table events
-    stream_table.on('select', (_, i) => {
+    COMP.stream_table.on('select', (_, i) => {
         const entry = STREAM_LIST[i - 1];
         play_url(entry);
-        s.debug('Playing: ', entry.url);
+        S.debug('Playing: ', entry.url);
     });
     // Arrow keys
-    stream_table.key(config.keys.stream_table.up, () => {
+    COMP.stream_table.key(CONFIG.keys.stream_table.up, () => {
         if (CURRENT_INDEX === 0) {
             // Select last index
             // Note: Up key event is triggered after the end of this function,
             //       because of that the index is STREAM_LIST.length and not
             //       STREAM_LIST.length-1
             CURRENT_INDEX = STREAM_LIST.length - 1;
-            stream_table.select(CURRENT_INDEX + 1);
+            COMP.stream_table.select(CURRENT_INDEX + 1);
+            S.render();
         }
         else {
             CURRENT_INDEX--;
         }
-        //s.debug( CURRENT_INDEX.toString() );
+        //S.debug( CURRENT_INDEX.toString() );
     });
-    stream_table.key(config.keys.stream_table.down, () => {
+    COMP.stream_table.key(CONFIG.keys.stream_table.down, () => {
         if (STREAM_LIST.length - 1 === CURRENT_INDEX) {
             // Select first index
             CURRENT_INDEX = 0;
-            stream_table.select(CURRENT_INDEX);
+            COMP.stream_table.select(CURRENT_INDEX);
+            S.render();
         }
         else {
             CURRENT_INDEX++;
         }
-        //s.debug( CURRENT_INDEX.toString() );
+        //S.debug( CURRENT_INDEX.toString() );
     });
     // Input form events
-    input.key('enter', () => {
-        const line = input.getText().trim();
+    COMP.input.key('enter', () => {
+        const line = COMP.input.getText().trim();
         input_handler(line);
     });
 }
@@ -486,41 +474,18 @@ function set_events() {
 * @description Main
 **/
 function main() {
-    if (argv.h) {
+    if (ARGV.h) {
         console.log(usage());
         process.exit();
     }
     // Initialize
     set_events();
-    s.append(header);
-    s.append(stream_table);
-    s.append(input);
-    s.append(loading);
-    stream_table.focus();
-    s.render();
+    S.append(COMP.header);
+    S.append(COMP.stream_table);
+    S.append(COMP.input);
+    S.append(COMP.loading);
+    COMP.stream_table.focus();
+    S.render();
     search_streams(LAST_SEARCH, SOURCE);
 }
 main();
-</code></pre>
-        </article>
-    </section>
-
-
-
-
-</div>
-
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Icecast.html">Icecast</a></li><li><a href="module-Mplayer.html">Mplayer</a></li><li><a href="module-Radio.html">Radio</a></li><li><a href="module-Util.html">Util</a></li></ul><h3>Global</h3><ul><li><a href="global.html#config">config</a></li><li><a href="global.html#display_rows">display_rows</a></li><li><a href="global.html#exit">exit</a></li><li><a href="global.html#format_header">format_header</a></li><li><a href="global.html#format_stream_list">format_stream_list</a></li><li><a href="global.html#format_title">format_title</a></li><li><a href="global.html#main">main</a></li><li><a href="global.html#pause">pause</a></li><li><a href="global.html#play_url">play_url</a></li><li><a href="global.html#query_streams">query_streams</a></li><li><a href="global.html#refresh_table">refresh_table</a></li><li><a href="global.html#search_streams">search_streams</a></li><li><a href="global.html#set_events">set_events</a></li><li><a href="global.html#set_header">set_header</a></li><li><a href="global.html#set_title">set_title</a></li><li><a href="global.html#stop">stop</a></li><li><a href="global.html#toggle_input">toggle_input</a></li><li><a href="global.html#usage">usage</a></li></ul>
-</nav>
-
-<br class="clear">
-
-<footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Mar 23 2018 19:03:00 GMT+0200 (Hora de verano romance)
-</footer>
-
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
-</body>
-</html>

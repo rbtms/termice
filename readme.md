@@ -1,7 +1,15 @@
 # netstreams
 Simple terminal net stream player
 
-# usage
+# Description
+
+# Install
+Netstreams is a nodejs program, so it needs the nodejs runtime in order to work.
+
+Download the repository somewhere you are comfortable 
+It's better to create an alias on .bashrc if you are on linux/cygwin
+
+# Usage
 
     netstreams [ARGS]
 
@@ -9,15 +17,13 @@ Simple terminal net stream player
       -q: Query
       -s: Source
 
-# Install
-
 # Bugs
-- Currently very slow on huge stream lists
+- Currently very slow on large lists
 
 # Configuration
 Currently, netstreams relies on Mplayer in order to work.
 <br>By defect, it looks on the bin folder for an executable file and falls back on the 'mplayer' command.
-<br>It is untested in other OS other than Windows so input about other systems would be apreciated.
+<br>It is untested in OS other than Windows 10 so input on other systems would be apreciated.
 
 # Documentation
 Refer to http://nishinishi9999.github.io/netstreams/index.html
@@ -37,8 +43,8 @@ Copyright (c) 2018 Alvaro Fernandez
 <br>You should have received a copy of the GNU General Public License
 <br>along with this program.  If not, see {@link https://www.gnu.org/licenses/}.
 
-# Special Thanks
-The authors of every module used in this program
+# Special thanks
+The authors of every module used in this program.
 
 # Version
 v0.1

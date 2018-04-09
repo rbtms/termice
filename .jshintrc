@@ -1,7 +1,0 @@
-{
-    "node": true,
-    "strict": true,
-    "esversion": 6,
-    "predef": ["require", "process", "console"],
-    "laxbreak": true
-}

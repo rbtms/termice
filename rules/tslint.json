@@ -1,0 +1,311 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "rules": {
+    /**
+    * Typescript-specific
+    **/
+        // Enforces overload signatures to be in consecutive lines
+        // Reason: Hard to read
+        "adjacent-overload-signatures": true,        
+        
+        "member-ordering": false,
+        
+        //"no-any": true,
+        
+        // Disallow the use of empty interfaces
+        "no-empty-interface": true,
+        
+        // Disallow the import of modules with side effects
+        // Reason: Evade some hard to find bugs
+        "no-import-side-effect": true,
+
+        // Enforce typedef declaration
+        // Reason: Unnecesary variable typedef make the code harder to read
+        "no-inferrable-types": true,
+        
+        // Disallow the use of magic numbers
+        // Reason: They make the code harder to understand and document
+        "no-magic-numbers": true,
+
+        // Disallow the reasignment of function parameters
+        "no-parameter-reassignment": true,
+        
+        // Disallow unnecessary type assertions
+        "no-unnecessary-type-assertion": true,
+        
+        // Disallow var module = require('module') import statements
+        "no-var-requires": true,
+        
+            // Requires arrow functions to be used instead of full function declarations
+            // Reason: Harder to read
+            "only-arrow-functions": [true, "allow-declarations"],
+        
+            "prefer-for-of": false,
+            
+            // Enforce promise-returning functions to be declarated with async
+            // Reason: Makes promises safer
+            //"promise-function-async": true,
+            
+            // Enforces typedef declarations
+            // Reason: It enforces obvious type declarations (a = 0), which are unnecesary
+            //,"typedef": [true, "call-signature", "parameter", "property-declaration", "variable-declaration"]
+        
+        // Enforces whitespace after : at typedefs
+        // Reason: Personal preference, it's easier to read without a space
+        "typedef-whitespace": false,
+        
+            "unified-signatures": false,
+        
+    /**
+    * Functionality
+    **/
+            "await-promise": true,
+
+        // Enforces braces for if/for/while statements
+        // Reason: This disallows single-line braceless if statements
+        "curly": false,
+        
+        // Disallow the use of the comma operator in unsafe situations
+        // Reason: Makes code hard to understand and introduces subtle bugs
+        "ban-comma-operator": true,
+        
+        // Disallow the use of = instead of == or === in conditionals
+        // Reason: Makes code hard to read and introduces subtle bugs
+        "no-conditional-assignment": true,
+
+        // Disallow calls to console.log
+        // Reason: Makes it hard to debug
+        "no-console": false,
+        
+        // Disallow eval
+        // Reason: Eval is dangerous and a security threat
+        "no-eval": true,
+    
+            "no-floating-promises": true,
+        
+        // Disallow for-in loops on arrays
+        // Reason: C-Like or for-on loops are safer
+        "no-for-in-array": true,
+
+        // Enforces local dependencies
+        // Reason: Global dependencies are useful for developing
+        //"no-implicit-dependencies": true,
+        
+            // Enforces mutability on function parameters
+            // Reason: Makes the code easier to read and understand
+            "no-null-keyword": true,
+            
+            "no-shadowed-variable": true,
+            "no-string-literal": true,
+            "no-string-throw": true,
+            "no-switch-case-fall-through": true,
+            "no-submodule-imports": true,
+        
+        // Disallows the use of "return await"
+        // Reason: An await function is going to return a promise anyways
+        "no-return-await": true,
+        
+        // Disallows missing elements in arrays
+        // Reason: They are usually bugs
+        "no-sparse-arrays": true,
+        
+        // Disallows the use of string throws
+        // Reason: Throwing Error objects produce stack traces
+        "no-string-throw": true,
+        
+        // Disallows the use of unused expressions
+        // Reason: They are dead code
+        "no-unused-expression": true,
+    
+            //"no-unsafe-any": true,
+            //"no-unbound-method": true,
+        
+        // Disallows the use of unused variables
+        // Reason: They are usually variable naming bugs
+        "no-unused-variable": [true, "check-parameters"],
+
+            // Disallows the use of var
+            // Reason: It's still useful to optimize C-Like for loops
+            // "no-var-keyword": true
+            
+            //"no-void-expression": [true, "ignore-arrow-function-shorthand"],
+        
+        // Require double quotes
+        // Reason: Single quotes are easier to type and read
+        "quotemark": [true, "single"],
+        
+        // Require the specification of the radix on parseInt
+        "radix": false,
+
+            // Enforces same-type variables on operands
+            "restrict-plus-operands": true,
+
+        // Enforces the use of boolean expressions on conditionals, !, && and ||
+        // Reason: !  expressions are useful for falsy values checking
+        //         || expressions are useful for initializing variables
+        "strict-boolean-expressions": false,
+        
+        // Disallows the use of expressions that always evaluate to true or false
+        // Reason: They are usually bugs
+        "strict-type-predicates": true,
+        
+        // Requires a default case in switch statements
+        "switch-default": true,
+        
+        // Enforces the use of === instead of == and !== instead of !=
+        "triple-equals": true,
+        
+        // Allow snake case to be used on variable names
+        "variable-name": [
+            "allow-snake-case"
+        ],
+        
+        // Enforces the use of isNaN() instead of NaN comparison
+        // Reason: Direct comparison evaluates to false and causes bugs
+        "use-isnan": true,
+        
+    /**
+    * Maintainability
+    **/
+        // Disallows the use of deprecated APIs
+        "deprecation": true,
+        
+        // Enforces a newline after the last line
+        // Reason: Some programs have problems accesing the last line if it's not followed by a newline
+        "eofline": true,
+        
+        // Enforces the use of spaces instead of tabs for indentation
+        // Reason: Tabs break the layout on some editors and github
+        "indent": [true, "spaces"],
+    
+            //"linebreak-style": [true, "CRLF"],
+            //"no-duplicate-imports": true,
+        
+        // Disallows importing modules with require()
+        // Reason: ES6 imports are more portable and versatile
+        "no-require-imports": true,
+        
+        // Require const declarations when possible
+        // Reason: It's more logical to declarate variables with const when they aren't
+        //         going to change and makes possible some compiler optimizations
+        "prefer-const": true,
+    
+            //"prefer-readonly": true,
+
+        // Enforces trailing commas
+        // Reason: Hard to read
+        "trailing-comma": false,
+    
+    /**
+    * Style
+    **/
+        //"align": true,
+        
+        // Enforces array declaration in the form T[] instead of Array<T>
+        "array-type": [true, "array"],
+        
+        // Enforces use of parentheses around parameters on arrow functions
+        "arrow-parens": true,
+        
+        // Requires simple returns from arrow functions to omit braces and the return keyword
+        "arrow-return-shorthand": [true, "multiline"],
+        
+        // Enforces use of PascalCase on interface names
+        "class-name": true,
+
+        // All comments must start with a space
+        // Reason: It's easier to debug with comments this way
+        "comment-format": false,
+    
+            //"completed-docs": true,
+        
+        // Enforces UTF-8 encoding
+        "encoding": true,
+        
+        // Enforces interface names to start with I_
+        // Reason: Hard to read, doesn't seem to have a lot of advantages
+        "interface-name": false,
+
+        // Disable spaces on import statements
+        // Reason: Disallows alignment
+        "import-spacing": false,
+        
+        // Enforce JSDOC comment alignment
+        // Reason: Comments are already aligned, there is no need to align the * themselves
+        "jsdoc-format": false,
+        
+            // Enforces a newline before return statements on multiline functions
+            "newline-before-return": true,
+        
+        // Enforces chained methods to be on separate lines
+        "newline-per-chained-call": false,
+        
+            // Disallows comparison with boolean literals
+            "no-boolean-literal-compare": false,
+        
+        // Disallow consecutive blank lines
+        // Reason: Makes it hard to separate code sections
+        "no-consecutive-blank-lines": false,
+    
+            //"no-irregular-whitespace": false,
+        
+        // Disallow the use of redundant JSDoc
+        "no-redundant-jsdoc": true,
+
+        // Disallow whitespace at the end of a line
+        // Reason: It's easier to move between lines
+        "no-trailing-whitespace": false,
+        
+        // Disallow the use of redundant wrappers ( (x) => f(x) -> f )
+        "no-unnecessary-callback-wrapper": true,
+        
+        // Disallow variable initialization to undefined
+        "no-unnecessary-initializer": true,
+        
+        // Enforces float declaration to start with 0. and not to end with unnecesary 0s
+        "number-literal-format": true,
+        
+        // Disallows the use of quotes around JSON keys
+        "object-literal-key-quotes": false,
+
+        // Enforces json keys alphabetic sorting
+        // Reason: I prefer to sort keys by sections or importance than by name
+        "object-literal-sort-keys": false,
+
+        // Requires some expressions to be on the same line as the expression preceeding them
+        // Reason: Enforces cuddled elses
+        "one-line": false,
+        
+        // Disallows more than one variable per declaration
+        "one-variable-per-declaration": [true, "ignore-for-loop"],
+        
+        // Require import statements to be ordered alphabetically
+        // Reason: I prefer to separate imports by sections than by name
+        "ordered-imports": false,
+        
+        // Suggest the use of switch statements instead of if on simple cases
+        "prefer-switch": [true, {"min-cases": 3}],
+        
+        // Enforces the use of string templates instead of concatenation on large statements
+        "prefer-template": [true, "allow-single-concat"],
+        
+        // Enforces return on void functions and return undefined on functions that return a value
+        "return-undefined": true,
+        
+        // Enforces the use of semicolons
+        "semicolon": true,
+        
+        // Enforces a (or lack of) space before function parentheses
+        "space-before-function-paren": [true, {"anonymous": "never", "named": "never", "method": "never"}],
+        
+        // Enforces whitespace on various places
+        // Yes: check-decl     : easier to read ( = )
+        //      check-preblock : easier to read ( function() { )
+        // No: check-branch   : harder to read ( if () )
+        //     check-operator : makes it easier to separate by groups ( a-1 === b )
+        "whitespace": [true, "check-decl", "check-preblock"]
+    }
+}

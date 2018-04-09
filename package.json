@@ -1,22 +1,28 @@
 {
   "name": "netstreams",
-  "author": "nishinishi9999 (Alvaro Fernandez)",
+  "author": "",
   "version": "0.1.0",
   "description": "Simple terminal net stream player",
-  "main": "main.js",
+  "main": "js/main.js",
   "scripts": {
-    "start": "node main.js",
-    "test": "mocha test/test.js",
-    "build": "pkg -t node8-win main.js",
-    "doc": "jsdoc -r -c jsdoc.json -d doc",
-    "lint": "jshint -c .jshintrc main.js js/"
+    "start": "node js/main.js",
+    "test": "mocha test/test.js || true",
+    "build": "tsc || true",
+    "pkg": "pkg -t node8-win main.js || true",
+    "doc": "jsdoc -r -c rules/jsdoc.json -d doc || true",
+    "lint": "tslint -p . -c rules/tslint.json --force"
   },
-  "author": "",
   "license": "GPL-3.0",
   "dependencies": {
     "blessed": "^0.1.81",
+    "jsonfile": "^4.0.0",
     "minimist": "^1.2.0",
     "request": "^2.83.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/blessed": "^0.1.10",
+    "@types/jsonfile": "^4.0.1",
+    "@types/minimist": "^1.2.0",
+    "@types/request": "^2.47.0"
+  }
 }

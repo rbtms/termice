@@ -1,28 +1,18 @@
-'use strict';
-
-const jsonfile = require('jsonfile');
-
-
-// Constants
-var config;
-
-try { config = jsonfile.readFileSync('./config.json'); }
-catch(err) { throw 'Couldn\'t load config.json: ' + err; }
-
-// Prevent properties from being modified
-Object.freeze(config);
+/**
+* Style declarations for blessed
+* @module Style
+**/
+import * as Util from './util.js';
 
 
-// format_header :: String
-function format_header(option) {
+function format_init_header(option :StringJSON) :string {
     const def_style = '{white-bg}{black-fg}';
     const pad = ' ';
     
-    var line = '';
-
-    for(var key in option) {
-        line += `${def_style} ${key} {/} ${option[key]}${pad}`;
-    }
+    
+    const line = Object.keys(option).reduce( (acc, key) =>
+        acc + ` ${def_style} ${key} {/} ${option[key]}${pad}`
+    , '');
     
     
     // Remove last space
@@ -30,13 +20,16 @@ function format_header(option) {
 }
 
 
-module.exports = {
+// Load config
+const config = Util.read_config('./config.json');
+
+export const style :AnyJSON = {
     header: {
         top     : 0,
         left    : 1,
         width   : '98%',
         height  : 3,
-        content : format_header(config.header),
+        content : format_init_header(config.header),
         tags    : true,
         
         padding: {
@@ -106,6 +99,32 @@ module.exports = {
     },
     
     input: {
+        bottom  : 0,
+        left    : 1,
+        width   : '98%',
+        height  : 3,
+        content : 'Input',
+        tags    : true,
+        
+        padding: {
+            left: 2
+        },
+        
+        hidden: true,
+        
+        inputOnFocus: true,
+        
+        border: {
+            type: 'bg'
+        },
+        
+        style: {
+            fg : 'black',
+            bg : 'white'
+        }
+    },
+    
+    loading: {
         bottom  : 0,
         left    : 1,
         width   : '98%',

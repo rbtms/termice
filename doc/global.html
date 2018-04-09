@@ -98,7 +98,7 @@
 
         
             
-<h4 class="name" id="config"><span class="type-signature"></span>config<span class="type-signature"></span></h4>
+<h4 class="name" id="config"><span class="type-signature">(constant) </span>config<span class="type-signature"></span></h4>
 
 
 
@@ -142,7 +142,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line64">line 64</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line67">line 67</a>
     </li></ul></dd>
     
 
@@ -219,18 +219,13 @@
 
             <td class="type">
             
-                
-<span class="param-type">Array</span>
-
-
-            
             </td>
 
             
 
             
 
-            <td class="description last">of JSON entries</td>
+            <td class="description last">of formatted rows</td>
         </tr>
 
     
@@ -271,7 +266,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line238">line 238</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line196">line 196</a>
     </li></ul></dd>
     
 
@@ -357,7 +352,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line107">line 107</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line92">line 92</a>
     </li></ul></dd>
     
 
@@ -391,7 +386,7 @@
     
 
     
-    <h4 class="name" id="format_header"><span class="type-signature"></span>format_header<span class="signature">(tab, options, pause_key, is_paused)</span><span class="type-signature"> &rarr; {String}</span></h4>
+    <h4 class="name" id="format_header"><span class="type-signature"></span>format_header<span class="signature">(tab, option, pause_key, is_paused)</span><span class="type-signature"></span></h4>
     
 
     
@@ -440,11 +435,6 @@
 
             <td class="type">
             
-                
-<span class="param-type">String</span>
-
-
-            
             </td>
 
             
@@ -458,15 +448,10 @@
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                <td class="name"><code>option</code></td>
             
 
             <td class="type">
-            
-                
-<span class="param-type">JSON</span>
-
-
             
             </td>
 
@@ -486,11 +471,6 @@
 
             <td class="type">
             
-                
-<span class="param-type">String</span>
-
-
-            
             </td>
 
             
@@ -508,11 +488,6 @@
             
 
             <td class="type">
-            
-                
-<span class="param-type">Bool</span>
-
-
             
             </td>
 
@@ -561,7 +536,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line166">line 166</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line142">line 142</a>
     </li></ul></dd>
     
 
@@ -593,18 +568,6 @@
 
 
 
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">String</span>
-
-
-    </dd>
-</dl>
-
     
 
 
@@ -617,7 +580,7 @@
     
 
     
-    <h4 class="name" id="format_stream_list"><span class="type-signature"></span>format_stream_list<span class="signature">(list, src)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    <h4 class="name" id="format_stream_list"><span class="type-signature"></span>format_stream_list<span class="signature">(list, rows_header, search, src)</span><span class="type-signature"></span></h4>
     
 
     
@@ -666,11 +629,6 @@
 
             <td class="type">
             
-                
-<span class="param-type">Array</span>
-
-
-            
             </td>
 
             
@@ -684,15 +642,46 @@
 
         <tr>
             
-                <td class="name"><code>src</code></td>
+                <td class="name"><code>rows_header</code></td>
             
 
             <td class="type">
             
-                
-<span class="param-type">String</span>
+            </td>
 
+            
 
+            
+
+            <td class="description last">Rows header</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>search</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Query search</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>src</code></td>
+            
+
+            <td class="type">
             
             </td>
 
@@ -741,7 +730,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line315">line 315</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line298">line 298</a>
     </li></ul></dd>
     
 
@@ -773,18 +762,6 @@
 
 
 
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Array</span>
-
-
-    </dd>
-</dl>
-
     
 
 
@@ -797,7 +774,7 @@
     
 
     
-    <h4 class="name" id="format_title"><span class="type-signature"></span>format_title<span class="signature">(src, name)</span><span class="type-signature"> &rarr; {String}</span></h4>
+    <h4 class="name" id="format_title"><span class="type-signature"></span>format_title<span class="signature">(src, name)</span><span class="type-signature"></span></h4>
     
 
     
@@ -805,7 +782,7 @@
 
 
 <div class="description">
-    Format the title line
+    Format the window title line
 </div>
 
 
@@ -846,11 +823,6 @@
 
             <td class="type">
             
-                
-<span class="param-type">String</span>
-
-
-            
             </td>
 
             
@@ -868,11 +840,6 @@
             
 
             <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
             
             </td>
 
@@ -921,7 +888,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line212">line 212</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line175">line 175</a>
     </li></ul></dd>
     
 
@@ -953,19 +920,93 @@
 
 
 
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
+    
+
+
+
+
+
         
-<span class="param-type">String</span>
-
-
-    </dd>
-</dl>
+            
 
     
+
+    
+    <h4 class="name" id="main"><span class="type-signature"></span>main<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Main
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line460">line 460</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1029,7 +1070,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line132">line 132</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line113">line 113</a>
     </li></ul></dd>
     
 
@@ -1112,11 +1153,6 @@
 
             <td class="type">
             
-                
-<span class="param-type">JSON</span>
-
-
-            
             </td>
 
             
@@ -1164,7 +1200,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line405">line 405</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line353">line 353</a>
     </li></ul></dd>
     
 
@@ -1198,7 +1234,7 @@
     
 
     
-    <h4 class="name" id="query_streams"><span class="type-signature"></span>query_streams<span class="signature">(search, src)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="query_streams"><span class="type-signature"></span>query_streams<span class="signature">(search, src)</span><span class="type-signature"></span></h4>
     
 
     
@@ -1206,7 +1242,7 @@
 
 
 <div class="description">
-    Get streams from <src> and display them
+    Get query function
 </div>
 
 
@@ -1247,11 +1283,6 @@
 
             <td class="type">
             
-                
-<span class="param-type">String</span>
-
-
-            
             </td>
 
             
@@ -1269,11 +1300,6 @@
             
 
             <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
             
             </td>
 
@@ -1322,7 +1348,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line250">line 250</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line206">line 206</a>
     </li></ul></dd>
     
 
@@ -1349,22 +1375,10 @@
 
         
 <div class="param-desc">
-    Query promise
+    Query function
 </div>
 
 
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Promise</span>
-
-
-    </dd>
-</dl>
 
     
 
@@ -1430,7 +1444,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line396">line 396</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line346">line 346</a>
     </li></ul></dd>
     
 
@@ -1513,11 +1527,6 @@
 
             <td class="type">
             
-                
-<span class="param-type">String</span>
-
-
-            
             </td>
 
             
@@ -1535,11 +1544,6 @@
             
 
             <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
             
             </td>
 
@@ -1588,7 +1592,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line362">line 362</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line322">line 322</a>
     </li></ul></dd>
     
 
@@ -1674,7 +1678,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line459">line 459</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line392">line 392</a>
     </li></ul></dd>
     
 
@@ -1757,11 +1761,6 @@
 
             <td class="type">
             
-                
-<span class="param-type">String</span>
-
-
-            
             </td>
 
             
@@ -1809,7 +1808,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line193">line 193</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line164">line 164</a>
     </li></ul></dd>
     
 
@@ -1892,11 +1891,6 @@
 
             <td class="type">
             
-                
-<span class="param-type">String</span>
-
-
-            
             </td>
 
             
@@ -1914,11 +1908,6 @@
             
 
             <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
             
             </td>
 
@@ -1967,7 +1956,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line224">line 224</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line183">line 183</a>
     </li></ul></dd>
     
 
@@ -2053,7 +2042,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line119">line 119</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line103">line 103</a>
     </li></ul></dd>
     
 
@@ -2139,7 +2128,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line423">line 423</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line365">line 365</a>
     </li></ul></dd>
     
 
@@ -2225,7 +2214,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="main.js.html">main.js</a>, <a href="main.js.html#line146">line 146</a>
+        <a href="main.js.html">main.js</a>, <a href="main.js.html#line125">line 125</a>
     </li></ul></dd>
     
 
@@ -2269,13 +2258,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Icecast.html">Icecast</a></li><li><a href="module-Mplayer.html">Mplayer</a></li><li><a href="module-Radio.html">Radio</a></li></ul><h3>Global</h3><ul><li><a href="global.html#config">config</a></li><li><a href="global.html#display_rows">display_rows</a></li><li><a href="global.html#exit">exit</a></li><li><a href="global.html#format_header">format_header</a></li><li><a href="global.html#format_stream_list">format_stream_list</a></li><li><a href="global.html#format_title">format_title</a></li><li><a href="global.html#pause">pause</a></li><li><a href="global.html#play_url">play_url</a></li><li><a href="global.html#query_streams">query_streams</a></li><li><a href="global.html#refresh_table">refresh_table</a></li><li><a href="global.html#search_streams">search_streams</a></li><li><a href="global.html#set_events">set_events</a></li><li><a href="global.html#set_header">set_header</a></li><li><a href="global.html#set_title">set_title</a></li><li><a href="global.html#stop">stop</a></li><li><a href="global.html#toggle_input">toggle_input</a></li><li><a href="global.html#usage">usage</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Icecast.html">Icecast</a></li><li><a href="module-Mplayer.html">Mplayer</a></li><li><a href="module-Radio.html">Radio</a></li><li><a href="module-Util.html">Util</a></li></ul><h3>Global</h3><ul><li><a href="global.html#config">config</a></li><li><a href="global.html#display_rows">display_rows</a></li><li><a href="global.html#exit">exit</a></li><li><a href="global.html#format_header">format_header</a></li><li><a href="global.html#format_stream_list">format_stream_list</a></li><li><a href="global.html#format_title">format_title</a></li><li><a href="global.html#main">main</a></li><li><a href="global.html#pause">pause</a></li><li><a href="global.html#play_url">play_url</a></li><li><a href="global.html#query_streams">query_streams</a></li><li><a href="global.html#refresh_table">refresh_table</a></li><li><a href="global.html#search_streams">search_streams</a></li><li><a href="global.html#set_events">set_events</a></li><li><a href="global.html#set_header">set_header</a></li><li><a href="global.html#set_title">set_title</a></li><li><a href="global.html#stop">stop</a></li><li><a href="global.html#toggle_input">toggle_input</a></li><li><a href="global.html#usage">usage</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Mar 16 2018 14:30:08 GMT+0200 (Hora de verano romance)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Mar 23 2018 19:03:00 GMT+0200 (Hora de verano romance)
 </footer>
 
 <script> prettyPrint(); </script>
