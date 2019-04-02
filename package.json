@@ -5,12 +5,11 @@
   "description": "Simple terminal net stream player",
   "main": "js/main.js",
   "scripts": {
-    "start": "node js/main.js",
+    "start": "NODE_PATH=./src/js node src/js/main.js",
     "test": "mocha test/test.js || true",
     "build": "tsc || true",
-    "pkg": "pkg -t node8-win main.js || true",
-    "doc": "jsdoc -r -c rules/jsdoc.json -d doc || true",
-    "lint": "tslint -p . -c rules/tslint.json --force"
+    "doc": "jsdoc -r -c jsdoc.json -d doc || true",
+    "lint": "tslint -p . -c tslint.json --force"
   },
   "license": "GPL-3.0",
   "dependencies": {
@@ -26,3 +25,4 @@
     "@types/request": "^2.47.0"
   }
 }
+

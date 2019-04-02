@@ -1,0 +1,49 @@
+{
+    "default_search": "anime",
+    "default_source": "Radio",
+    
+    "pause_key": "Sp",
+
+    "header": {
+        "Q": "Exit",
+        "Esc": "Search",
+        "I": "Icecast",
+        "S": "Shoutcast",
+        "R": "Radio",
+        "P": "Refresh",
+        "Sp": "Pause",
+        "K": "Stop"
+    },
+    
+    "keys": {
+        "screen": {
+            "quit": "q",
+            "input": "escape",
+            "pause": "space",
+            "stop": "k",
+            "vol_up": "+",
+            "vol_down": "-",
+            "icecast": "i",
+            "shoutcast": "s",
+            "radio": "r",
+            "refresh": "p"
+        },
+        "stream_table": {
+            "up": "up",
+            "down": "down"
+        }
+    },
+    
+    "table_headers": {
+        "Icecast" : ["Name", "Playing", "Listeners"],
+        "Shoutcast" : ["Name", "Playing", "Listeners"],
+        "Radio": ["Name", "Bitrate"]
+    },
+    
+    "mplayer": {
+        "cache": "1024",
+        "path": "mplayer",
+        "wait_io": 100
+    }
+}
+
