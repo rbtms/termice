@@ -59,145 +59,115 @@ const Style = __importStar(require("./lib/style"));
  * TODO
  *
  * Update currently playing track information
- * Modularization
  * Add currently playing bar
  * Update frequently
  *
  * Add podcasts
  * Add free music sources
  **/
-// Constants
-const ARGV = minimist_1.default(process.argv);
-const CONFIG = Util.read_config(Util.CONFIG_PATH);
-const S = Blessed.screen({
-    autoPadding: true,
-    debug: true,
-    fullUnicode: true,
-    //forceUnicode: true,
-    smartCSR: true,
-});
-// Blessed components
-const COMP = {
-    header: Blessed.listbar(Style.style.header),
-    stream_table: Blessed.listtable(Style.style.stream_table),
-    input: Blessed.textarea(Style.style.input),
-    loading: Blessed.loading(Style.style.loading)
-};
 // Usage
-const USAGE = `
+function print_usage_and_exit() {
+    console.log(`
 Usage: netstreams [ARGS]
 
-Arguments:
+Options:
+  -h: Show this help
   -q: Query
-  -s: Source
-`;
-// Global variables
-let LAST_SEARCH = ARGV.q || CONFIG.default_search;
-let SOURCE = ARGV.s || CONFIG.default_source;
-let CURRENT_INDEX = 0;
-let STREAM_LIST = [];
-// Global flags
-let IS_PLAYING = false;
-let IS_PAUSED = false;
-let IS_INPUT = false;
+  -s: Source [Icecast | Shoutcast | Radio]
+`);
+    process.exit();
+}
 /**
  * @description Stop the player and exit
  **/
-function exit(line) {
-    Mplayer.quit(() => {
-        // Exit interface
-        S.destroy();
-        // Print exit line if there is one
-        if (line)
-            throw Error(line);
+async function exit(s, line) {
+    await Mplayer.quit();
+    // Exit interface
+    s.scr.destroy();
+    // Print exit line if there is one
+    if (line)
+        throw Error(line);
+    else
         process.exit();
-    });
 }
 /**
  * @description Stop the player
  **/
-function stop() {
-    Mplayer.stop(() => {
-        IS_PLAYING = false;
-        // Update title
-        set_title(SOURCE);
-    });
+async function stop(s) {
+    await Mplayer.stop();
+    const s2 = set_flags(s, { is_playing: !s.flags.is_playing });
+    // Update title
+    set_title(s2);
+    return s2;
+}
+function set_flags(s, flags) {
+    const _flags = Object.assign(Object.assign({}, s.flags), flags);
+    return {
+        scr: s.scr,
+        comp: s.comp,
+        config: s.config,
+        stream_list: s.stream_list.slice(),
+        flags: _flags
+    };
+}
+function set_stream_list(s, list) {
+    return Object.assign(s, { stream_list: list });
 }
 /**
  * @description Pause/Resume the player
  **/
-function pause() {
-    Mplayer.pause(() => {
-        IS_PAUSED = !IS_PAUSED;
-        // Update pause key text
-        set_header(SOURCE);
-        set_title(SOURCE);
-    });
+async function pause(s) {
+    await Mplayer.pause();
+    // Update pause key text
+    // Renders screen
+    set_header_title(s);
+    return set_flags(s, { is_paused: !s.flags.is_paused });
 }
 /**
- * @description Format header line
- * @param tab       Current tab
- * @param option    Option key-value pairs
- * @param pause_key Header key text of the pause key
- * @param is_paused Whether the player is currently paused or not
- * @return Formatted header line
+ * @description Play a url with mplayer
+ * @param entry Table entry
  **/
-function format_header(tab, option, pause_key, is_paused) {
-    const def_style = '{white-bg}{black-fg}'; // Default style
-    const sel_style = '{green-bg}{black-fg}'; // Selected style
-    const pad = ' ';
-    const line = Object.keys(option).reduce((acc, key) => {
-        const letter = key;
-        const text = letter == pause_key
-            ? !is_paused
-                ? 'Pause'
-                : 'Resume'
-            : option[key];
-        const style = text === tab ? sel_style : def_style;
-        return acc + ` ${style} ${letter} {/} ${text}${pad}`;
-    }, '');
-    // Remove last space
-    // TODO: Replace for trim
-    return line.substr(0, line.length - 1);
+async function play_url(s, entry) {
+    await Mplayer.play(entry.url, entry.is_playlist);
+    const s2 = set_flags(s, {
+        is_playing: false,
+        is_paused: false
+    });
+    // Renders screen
+    set_header_title(s2, entry.name);
+    return set_flags(s2, { is_playing: true });
 }
 /**
  * @description Set current tab in the header
  * @param tab Current tab
  **/
-function set_header(tab) {
-    const line = format_header(tab, CONFIG.header, CONFIG.pause_key, IS_PAUSED);
-    COMP.header.setContent(line);
-    S.render();
-}
-/**
- * @description Format the window title line
- * @param src  Current source
- * @param name Entry name
- * @return Title line
- **/
-function format_title(src, name) {
-    return `Net streams - ${src}` + (name === '' ? '' : ` | ${name}`);
+function set_header(s) {
+    const line = Util.format_header(s.flags.last_tab, s.config.header, s.config.pause_key, s.flags.is_paused);
+    s.comp.header.setContent(line);
 }
 /**
  * @description Set window title
  * @param src  Current source
  * @param name Entry name
  **/
-function set_title(src, name) {
+function set_title(s, stream_name) {
     // Keep the old title if it's playing
-    if (IS_PLAYING)
-        return;
-    S.title = name === undefined
-        ? format_title(src, '')
-        : format_title(src, name);
+    if (!s.flags.is_playing)
+        s.scr.title = stream_name === undefined
+            ? Util.format_title(s, '')
+            : Util.format_title(s, stream_name);
+}
+function set_header_title(s, stream_name) {
+    set_header(s);
+    set_title(s, stream_name);
+    s.scr.render();
 }
 /**
  * @description Display <rows> in stream_table
  * @param Array of formatted rows
  **/
-function display_rows(rows) {
-    COMP.stream_table.setData(rows);
-    S.render();
+function set_rows(s, rows) {
+    s.comp.stream_table.setData(rows);
 }
 /**
  * @description Get query function
@@ -205,127 +175,44 @@ function display_rows(rows) {
  * @param src    Stream source
  * @return Query function
  **/
-function query_streams(search, src) {
-    switch (src) {
+function query_streams(s, search) {
+    switch (s.flags.source) {
         case 'Icecast': {
-            return () => Icecast.search_xiph(search);
+            return Icecast.search_xiph(search);
         }
         case 'Shoutcast': {
-            return () => Icecast.search_shoutcast(search);
+            return Icecast.search_shoutcast(search);
         }
         case 'Radio': {
             // Parse mode
             const has_mode = search.includes(':');
-            switch (has_mode) {
-                // There is a match
-                case true: {
-                    const [mode, subsearch] = search.split(':');
-                    switch (mode) {
-                        // It's a valid mode
-                        case 'name':
-                        case 'tag':
-                        case 'country':
-                        case 'language': {
-                            return () => Radio.search_radio(mode, subsearch);
-                        }
-                        // It isn't a valid mode
-                        default: {
-                            S.debug('Mode not recognized: ' + mode);
-                            return query_streams(LAST_SEARCH, SOURCE);
-                        }
+            // There is a match
+            if (has_mode) {
+                const [mode, subsearch] = search.split(':');
+                switch (mode) {
+                    // It's a valid mode
+                    case 'name':
+                    case 'tag':
+                    case 'country':
+                    case 'language': {
+                        return Radio.search_radio(mode, subsearch);
+                    }
+                    // It isn't a valid mode
+                    default: {
+                        return query_streams(s, s.flags.last_search);
                     }
                 }
-                // There is not a match
-                default: {
-                    return () => Radio.search_radio(search, 'name');
-                }
+            }
+            // There is not a match
+            else {
+                return Radio.search_radio(search, 'name');
             }
         }
         default: {
-            S.debug('Source not recognized: ' + src);
-            return query_streams(LAST_SEARCH, SOURCE);
+            //await exit(s, 'Not a valid source: ' + s.flags.source);
+            process.exit();
+            return query_streams(s, s.flags.last_search);
         }
-    }
-}
-/**
- * @description Add left padding to stream_table cells
- * @param rows_header Header
- * @param rows        Table rows
- * @return Padded table rows
- **/
-function add_rows_padding(rows_header, rows) {
-    const pad = '  ';
-    return [rows_header].concat(rows).map((arr) => arr.map((cell) => pad + cell));
-}
-/**
- * @description Format icecast entries into stream_table rows
- * @param rows_header Header
- * @param list        Icecast entry list
- * @return Formatted table rows
- **/
-function icecast_list(rows_header, list) {
-    const char_limit = {
-        name: 30,
-        playing: 50,
-        description: 50,
-        listeners: 20
-    };
-    return add_rows_padding(rows_header, list.map((entry) => {
-        const playing = entry.playing || '';
-        const listeners = entry.listeners || 'Null';
-        //const description = entry.description || 'Null';
-        return [
-            entry.name.substr(0, char_limit.name),
-            playing.substr(0, char_limit.playing),
-            //description.substr(0, char_limit.description),
-            listeners.substr(0, char_limit.listeners)
-        ];
-    }));
-}
-/**
- * @description Format radio entries into stream_table rows
- * @param rows_header Header
- * @param list        Radio entry list
- * @return Formatted table rows
- **/
-function radio_list(rows_header, list) {
-    const bitrate_pad = '   ';
-    const char_limit = {
-        name: 50
-    };
-    return add_rows_padding(rows_header, list.map((entry) => {
-        const bitrate = entry.bitrate || 'Null';
-        const pad = bitrate_pad.substr(bitrate.length);
-        return [
-            entry.name.substr(0, char_limit.name),
-            `${pad}${bitrate} kbps`
-        ];
-    }));
-}
-/**
- * @description Get streams from <src>
- * @param list        Entry list
- * @param rows_header Rows header
- * @param search      Query search
- * @param src         Stream source
- * @return Array of JSON Entries
- **/
-function format_stream_list(list, rows_header, search) {
-    switch (list.length > 0) {
-        case true:
-            const src = list[0].src;
-            switch (src) {
-                case 'Icecast':
-                case 'Shoutcast':
-                    return icecast_list(rows_header, list);
-                case 'Radio':
-                    return radio_list(rows_header, list);
-                default:
-                    exit('Unknown source: ' + src);
-                    return false;
-            }
-        default:
-            return add_rows_padding(rows_header, [['No results for: ' + search]]);
     }
 }
 /**
@@ -333,165 +220,179 @@ function format_stream_list(list, rows_header, search) {
  * @param search Unformatted query string
  * @param src    Streams source
  **/
-function search_streams(search, src) {
-    S.debug('Searching: ', search);
-    COMP.loading.load('Searching: ' + search);
-    // Update global variables
-    LAST_SEARCH = search;
-    CURRENT_INDEX = 0;
-    query_streams(search, src)().then((list) => {
-        // Update current stream list for events
-        STREAM_LIST = list;
-        // Process the list and display it
-        const rows = format_stream_list(list, CONFIG.table_headers[src], search);
-        //// Show an error message on false
-        if (rows !== false) {
-            display_rows(rows);
-            COMP.loading.stop();
-            set_header(src);
-            set_title(src);
-        }
-    })
-        .catch((err) => { S.debug('Error: ' + err); });
+async function search_streams(s, search) {
+    s.comp.loading.load('Searching: ' + search);
+    // Update flags
+    const s2 = set_flags(s, {
+        last_search: search,
+        last_tab: s.flags.source,
+        current_index: 0
+    });
+    const list = await query_streams(s2, search);
+    // Update current stream list for events
+    const s3 = set_stream_list(s2, list);
+    // Process the list and display it
+    const rows = Util.format_stream_list(s3, list, s3.config.table_headers[s3.flags.source], search);
+    //// Show an error message on false
+    if (rows !== false) {
+        set_rows(s3, rows);
+        s3.comp.loading.stop();
+        // Renders screen
+        set_header_title(s3);
+    }
+    return s3;
 }
 /**
  * @description Refresh table with last query
  **/
-function refresh_table() {
-    search_streams(LAST_SEARCH, SOURCE);
-}
-/**
- * @description Play a url with mplayer
- * @param entry Table entry
- **/
-function play_url(entry) {
-    Mplayer.play(entry.url, entry.is_playlist, () => {
-        IS_PLAYING = false;
-        IS_PAUSED = false;
-        set_header(entry.src);
-        set_title(entry.src, entry.name);
-        IS_PLAYING = true;
-    });
+async function refresh_table(s) {
+    return await search_streams(s, s.flags.last_search);
 }
 /**
  * @description Toggle the input textarea
  **/
-function toggle_input() {
-    S.debug('toggle');
+function toggle_input(s) {
+    const tab = s.flags.is_input ? s.flags.source : 'Search';
+    const s2 = set_flags(s, { last_tab: tab, is_input: !s.flags.is_input });
     // Toggle input
-    COMP.input.toggle();
-    S.render();
+    //s2.comp.input.toggle();
     // Enable input
-    if (!IS_INPUT)
-        COMP.input.input();
-    // Change tab
-    const tab = IS_INPUT ? SOURCE : 'Search';
-    set_header(tab);
-    set_title(tab);
-    IS_INPUT = !IS_INPUT;
-}
-function input_handler(str) {
-    if (str === ':q') {
-        exit();
+    if (s2.flags.is_input) {
+        s2.comp.input.show();
+        s2.comp.input.input();
+        // Renders
+        //s2.comp.input.input();
     }
     else {
-        COMP.input.clearValue();
-        search_streams(str, SOURCE);
-        toggle_input();
+        s2.comp.input.hide();
+        //s2.comp.input.hide();
+        //s2.comp.stream_table.focus();
+        //s2.comp.input.render();
+        //s2.comp.input.cancel()
+    }
+    set_header_title(s2);
+    return s2;
+}
+async function input_handler(s, line) {
+    // Command
+    if (line === ':q') {
+        await exit(s);
+        return s;
+    }
+    // Query
+    else {
+        s.comp.input.clearValue();
+        const s2 = await search_streams(s, line);
+        return toggle_input(s2);
     }
 }
 /**
  * @description Set events
  **/
-function set_events() {
+function set_events(s) {
     // Screen events
-    S.key([CONFIG.keys.screen.quit], (_) => exit()); // Discard arguments
-    S.key([CONFIG.keys.screen.pause], (_) => pause());
-    S.key([CONFIG.keys.screen.stop], (_) => stop());
-    S.key([CONFIG.keys.screen.input], toggle_input);
-    S.key([CONFIG.keys.screen.vol_up], () => Mplayer.volume('+1'));
-    S.key([CONFIG.keys.screen.vol_down], () => Mplayer.volume('-1'));
+    s.scr.key([s.config.keys.screen.quit], () => exit(s)); // Discard arguments
+    s.scr.key([s.config.keys.screen.pause], async () => {
+        const s2 = await pause(s);
+        set_events(s2);
+    });
+    s.scr.key([s.config.keys.screen.stop], async () => {
+        const s2 = await stop(s);
+        set_events(s2);
+    });
+    s.scr.key([s.config.keys.screen.vol_up], () => Mplayer.volume('+1'));
+    s.scr.key([s.config.keys.screen.vol_down], () => Mplayer.volume('-1'));
+    s.scr.key([s.config.keys.screen.input], async () => {
+        const s2 = await toggle_input(s);
+        set_events(s2);
+    });
     // Icecast tab
-    S.key(CONFIG.keys.screen.icecast, () => {
-        SOURCE = 'Icecast';
-        refresh_table();
+    s.scr.key(s.config.keys.screen.icecast, async () => {
+        const s2 = await refresh_table(set_flags(s, { source: 'Icecast' }));
+        set_events(s2);
     });
     // Shoutcast tab
-    S.key(CONFIG.keys.screen.shoutcast, () => {
-        SOURCE = 'Shoutcast';
-        refresh_table();
+    s.scr.key(s.config.keys.screen.shoutcast, async () => {
+        const s2 = await refresh_table(set_flags(s, { source: 'Shoutcast' }));
+        set_events(s2);
     });
     // Radio tab
-    S.key(CONFIG.keys.screen.radio, () => {
-        SOURCE = 'Radio';
-        refresh_table();
+    s.scr.key(s.config.keys.screen.radio, async () => {
+        const s2 = await refresh_table(set_flags(s, { source: 'Radio' }));
+        set_events(s2);
     });
     // Refresh table
-    S.key(CONFIG.keys.screen.refresh, () => {
-        refresh_table();
+    s.scr.key(s.config.keys.screen.refresh, async () => {
+        const s2 = await refresh_table(s);
+        set_events(s2);
     });
     // Stream table events
-    COMP.stream_table.on('select', (_, i) => {
-        const entry = STREAM_LIST[i - 1];
-        play_url(entry);
-        S.debug('Playing: ', entry.url);
-    });
-    // Arrow keys
-    COMP.stream_table.key(CONFIG.keys.stream_table.up, () => {
-        if (CURRENT_INDEX === 0) {
-            // Select last index
-            // Note: Up key event is triggered after the end of this function,
-            //       because of that the index is STREAM_LIST.length and not
-            //       STREAM_LIST.length-1
-            CURRENT_INDEX = STREAM_LIST.length - 1;
-            COMP.stream_table.select(CURRENT_INDEX + 1);
-            S.render();
-        }
-        else {
-            CURRENT_INDEX--;
-        }
-        //S.debug( CURRENT_INDEX.toString() );
-    });
-    COMP.stream_table.key(CONFIG.keys.stream_table.down, () => {
-        if (STREAM_LIST.length - 1 === CURRENT_INDEX) {
-            // Select first index
-            CURRENT_INDEX = 0;
-            COMP.stream_table.select(CURRENT_INDEX);
-            S.render();
-        }
-        else {
-            CURRENT_INDEX++;
-        }
-        //S.debug( CURRENT_INDEX.toString() );
+    s.comp.stream_table.on('select', async (_, i) => {
+        const entry = s.stream_list[i - 1];
+        const s2 = await play_url(s, entry);
+        set_events(s2);
     });
     // Input form events
-    COMP.input.key('enter', () => {
-        const line = COMP.input.getText().trim();
-        input_handler(line);
+    s.comp.input.key('enter', async () => {
+        const line = s.comp.input.getText().trim();
+        const s2 = await input_handler(s, line);
+        set_events(s2);
     });
 }
-// TODO: Initialize
-function init() {
-    set_events();
-    // TODO: Move this to head of the file maybe
-    S.append(COMP.header);
-    S.append(COMP.stream_table);
-    S.append(COMP.input);
-    S.append(COMP.loading);
-    COMP.stream_table.focus();
-    S.render();
-    search_streams(LAST_SEARCH, SOURCE);
+function init(s) {
+    set_events(s);
+    //set_header(s);
+    s.scr.render();
+    search_streams(s, s.flags.last_search);
+}
+function init_state(config, argv) {
+    const scr = Blessed.screen({
+        autoPadding: true,
+        debug: true,
+        fullUnicode: true,
+        //forceUnicode: true,
+        smartCSR: true,
+    });
+    // Blessed components
+    const comp = {
+        header: Blessed.listbar(Style.style.header),
+        stream_table: Blessed.listtable(Style.style.stream_table),
+        input: Blessed.textarea(Style.style.input),
+        loading: Blessed.loading(Style.style.loading)
+    };
+    scr.append(comp.header);
+    scr.append(comp.stream_table);
+    scr.append(comp.input);
+    scr.append(comp.loading);
+    comp.stream_table.focus();
+    return {
+        scr,
+        comp,
+        config,
+        stream_list: [],
+        flags: {
+            last_search: argv.q || config.default_search,
+            last_tab: argv.s || config.default_source,
+            source: argv.s || config.default_source,
+            current_index: 0,
+            is_playing: false,
+            is_paused: false,
+            is_input: false
+        }
+    };
 }
 /**
  * @description Main
  **/
 function main() {
-    if (ARGV.h) {
-        console.log(USAGE);
-        process.exit();
-    }
-    else {
-        init();
-    }
+    const available_opts = ['h', 'q', 's', '_'];
+    const config = Util.read_config(Util.CONFIG_PATH);
+    const argv = minimist_1.default(process.argv);
+    const s = init_state(config, argv);
+    if (argv.h
+        || !!Object.keys(argv).find((opt) => !available_opts.includes(opt)))
+        print_usage_and_exit();
+    else
+        init(s);
 }
 main();

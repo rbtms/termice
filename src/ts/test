@@ -14,16 +14,16 @@ Global variables
   IS_PAUSED      - Whether mplayer is paused
   IS_INPUT       - Whether there is input
 
-IO exit
+IO exit :promise<state>
   S
   process.exit
 
-IO stop
+IO stop :promise<state>
   IS_PLAYING
   SOURCE
   Mplayer
 
-IO pause
+IO pause :promise<state>
   IS_PAUSED
   SOURCE
   set_header
@@ -31,25 +31,27 @@ IO pause
 
 PURE format_header
 
-IO set_header
+IO set_header : void !MODIFIES S.COMP.HEADER
   CONFIG
   IS_PAUSED
   COMP
   S
 
-PURE format_title
+PURE format_title :string
 
-IO set_title
+IO set_title : void !MODIFIES S.SCR.TITLE
   IS_PLAYING
   S
 
-IO display_rows
+IO display_rows : void !MODIFIES S.COMP.TABLE
   COMP
   S
 
-IO query_streams
+IO query_streams :promise<Entry[]>
   Icecast
   Radio
+  LAST_SEARCH
+  SOURCE
 
 PURE add_rows_padding
 PURE icecast_list
@@ -57,7 +59,7 @@ PURE radio_list
 PURE format_stream_list
 
 
-IO search_streams
+IO search_streams :promise<State>
   LAST_SEARCH
   CURRENT_INDEX
   CONFIG
@@ -118,12 +120,51 @@ main()
   check arguments
   init
 
+-------------------------------
 
-init()
+exit
+pause
+stop
+
+play_url
+  :is_playing
+  :is_paused
+  set_header
+  set_title
+
+search_streams
+  - toggle loading
+  : last_search, current_index
+  : stream_list
+  > display_rows
+  > set_header
+  > set_title
+  
+
+refresh_table
+  > search_streams
+
+toggle_input
+  - toggle input
+  set_header
+  set_title
+  : is_input
+
+input_handler
+  - clear input
+  > search_streams
+  > toggle_input
+
+init
   set_events
-  append_components
-  render screen
-  search_streams
-
-
+    exit
+    pause
+    stop
+    Mplayer
+    > toggle_input
+    > play_url
+    > refresh_table
+    > input_handler
+    
+  > search_streams
 

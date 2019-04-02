@@ -10,24 +10,25 @@ function format_init_header(option :StringJSON) :string {
   const def_style = '{white-bg}{black-fg}';
   const pad = ' ';
 
-
   const line = Object.keys(option).reduce( (acc, key) =>
     acc + ` ${def_style} ${key} {/} ${option[key]}${pad}`
     , '');
-
 
   // Remove last space
   return line.substr(0, line.length-1);
 }
 
-
+/*
+ * Constants
+ */
 const config = Util.read_config(Util.CONFIG_PATH);
+
 export const style :AnyJSON = {
   header: {
     top     : 0,
     left    : 1,
     width   : '98%',
-    height  : 3,
+    height  : '8%',
     content : format_init_header(config.header),
     tags    : true,
 
@@ -36,7 +37,7 @@ export const style :AnyJSON = {
     },
 
     border: {
-      type: 'line'
+      type: 'bg'
     },
 
     style: {
@@ -56,14 +57,15 @@ export const style :AnyJSON = {
     top     : 3,
     left    : 1,
     width   : '98%',
-    height  : '80%',
+    height  : '90%',
     content : '  Loading...',
     align   : 'left',
     keys    : ['up', 'down'],
     tags    : true,
+    noCellBorders: true,
 
     border: {
-      type: 'line'
+      type: 'bg'
     },
 
     /*
@@ -92,7 +94,7 @@ export const style :AnyJSON = {
         fg: 'black'
       },
       cell: {
-        fg: 'green'
+        fg: 'black'
       }
     }
   },

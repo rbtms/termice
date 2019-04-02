@@ -19,20 +19,23 @@ function format_init_header(option) {
     // Remove last space
     return line.substr(0, line.length - 1);
 }
+/*
+ * Constants
+ */
 const config = Util.read_config(Util.CONFIG_PATH);
 exports.style = {
     header: {
         top: 0,
         left: 1,
         width: '98%',
-        height: 3,
+        height: '8%',
         content: format_init_header(config.header),
         tags: true,
         padding: {
             left: 2
         },
         border: {
-            type: 'line'
+            type: 'bg'
         },
         style: {
             fg: 'white',
@@ -49,13 +52,14 @@ exports.style = {
         top: 3,
         left: 1,
         width: '98%',
-        height: '80%',
+        height: '90%',
         content: '  Loading...',
         align: 'left',
         keys: ['up', 'down'],
         tags: true,
+        noCellBorders: true,
         border: {
-            type: 'line'
+            type: 'bg'
         },
         /*
             padding: {
@@ -79,7 +83,7 @@ exports.style = {
                 fg: 'black'
             },
             cell: {
-                fg: 'green'
+                fg: 'black'
             }
         }
     },
