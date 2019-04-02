@@ -1,13 +1,5 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-/**
- * Query and parse Icecast and Shoutcast directories
- * @module Icecast
- **/
-const request_1 = __importDefault(require("request"));
 /**
  * @method search_xiph
  * @description Search the xiph icecast directory
@@ -20,7 +12,7 @@ function search_xiph(search) {
             method: 'GET',
             url: 'http://dir.xiph.org/search?search=' + search.split(' ').join('+')
         };
-        request_1.default(options, (err, _, body) => {
+        require('request')(options, (err, _, body) => {
             if (err)
                 reject(err);
             resolve(parse_xiph(body));
@@ -43,7 +35,7 @@ function search_shoutcast(search) {
                 query: search.split(' ').join('+')
             }
         };
-        request_1.default(options, (err, _, body) => {
+        require('request')(options, (err, _, body) => {
             if (err)
                 reject(err);
             const json = JSON.parse(body);

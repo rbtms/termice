@@ -1,3 +1,7 @@
+/**
+* Query and parse radio-browser open radio directory
+* @module Radio
+**/
 import { RadioEntry } from './interfaces';
 /**
 * @method search_radio

@@ -3,7 +3,7 @@ export declare const CONFIG_PATH = "./src/js/config.json";
 /**
  * @description Read configuration file
  **/
-export declare function read_config(path: string): AnyJSON;
+export declare function read_config(): AnyJSON;
 /**
  * @description Format the window title line
  * @param src  Current source

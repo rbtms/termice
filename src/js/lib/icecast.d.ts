@@ -1,3 +1,7 @@
+/**
+ * Query and parse Icecast and Shoutcast directories
+ * @module Icecast
+ **/
 import { IcecastEntry } from './interfaces';
 /**
  * @method search_xiph

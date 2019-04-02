@@ -13,131 +13,131 @@ Object.defineProperty(exports, "__esModule", { value: true });
  **/
 const child_process_1 = require("child_process");
 const Util = __importStar(require("./util.js"));
-// Load config
-const CONFIG = Util.read_config(Util.CONFIG_PATH);
-// Constants
-const DEF_CACHE = '1024';
-const DEF_WAIT_IO = 100;
-const CACHE_SIZE = CONFIG.mplayer.cache || DEF_CACHE; // Mplayer cache size in kb
-const WAIT_IO = CONFIG.mplayer.wait_io || DEF_WAIT_IO; // Time to wait after IO in ms
-// Global variables
-let mplayer;
-/**
- * @method mplayer_cmd
- * @description Try to find the mplayer command
- * @param config_path Configuration file mplayer path
- * @return cmd Mplayer command
- **/
-function mplayer_cmd(config_bin_path) {
+class Mplayer {
+    constructor() {
+        const config = Util.read_config();
+        // Default cache in kb
+        this.def_cache = '1024';
+        // Time to wait after IO
+        this.def_wait_io = 100;
+        // Mplayer cache size in kb
+        this.cache_size = config.mplayer.cache || this.def_cache;
+        // Time to wait after IO in ms
+        this.wait_io = config.mplayer.wait_io || this.def_wait_io;
+        // Path to the mplayer binary
+        this.bin_path = config.mplayer.path || 'mplayer';
+        this.pipe;
+        this.is_init = false;
+    }
     /**
-     * Set to the path variable in config if it's defined
+     * @method kill
+     * @description Kill all mplayer processes
+     * @param f (Optional) Callback function
      **/
-    if (config_bin_path !== '')
-        return config_bin_path;
-    else
-        return 'mplayer';
-}
-/**
- * kill :: Function -> IO()
- * @method kill
- * @description Kill all mplayer processes
- * @param f (Optional) Callback function
- **/
-function kill(f) {
-    const cmd = 'Taskkill /IM mplayer.exe /F';
-    child_process_1.execSync(cmd);
-    if (f)
-        f();
-}
-exports.kill = kill;
-/**
- * @method mplayer_stdin
- * @description Write a string to mplayer process stdin pipe
- * @param line         String to be written
- * @param f            (Optional) Callback function
- * @param call_no_init Call the callback even if mplayer is not initiated
- **/
-function mplayer_stdin(line, f, call_no_init) {
-    if (mplayer !== undefined) {
-        mplayer.stdin.write(line + '\n');
-        if (f)
-            setTimeout(f, WAIT_IO);
+    // TODO: Dont kill all processes
+    async kill() {
+        const cmd = 'killall mplayer';
+        return new Promise((resolve, reject) => {
+            child_process_1.exec(cmd, (err) => {
+                if (err)
+                    reject(err);
+                else
+                    resolve();
+            });
+        });
     }
-    else {
-        if (f && call_no_init)
-            f();
+    /**
+     * @method mplayer_stdin
+     * @description Write a string to mplayer process stdin pipe
+     * @param line         String to be written
+     * @param f            (Optional) Callback function
+     * @param call_no_init Call the callback even if mplayer is not initiated
+     **/
+    async mplayer_stdin(line, call_no_init) {
+        return new Promise((resolve, reject) => {
+            if (!this.is_init) {
+                this.pipe.stdin.write(line + '\n');
+                setTimeout(resolve, this.wait_io);
+            }
+            else if (call_no_init) {
+                resolve();
+            }
+            else {
+                reject(Error('mplayer_stdin: Idk why this fails.'));
+            }
+        });
+    }
+    init_mplayer(url, is_playlist) {
+        if (this.is_init) {
+            throw Error('Mplayer already initiated.');
+        }
+        else {
+            const args = ['-cache', this.cache_size, '-slave'];
+            const options = {
+                detached: true,
+                stdio: ['pipe', 'ignore', 'ignore']
+            };
+            this.pipe = is_playlist
+                ? child_process_1.spawn(this.bin_path, args.concat('-playlist', url), options)
+                : child_process_1.spawn(this.bin_path, args.concat(url), options);
+            this.is_init = true;
+        }
+    }
+    async loadfile(url, is_playlist) {
+        const cmd = is_playlist ? 'loadlist' : 'loadfile';
+        await this.mplayer_stdin(`${cmd} ${url} 0`, true);
+    }
+    /**
+     * @method play
+     * @description Play a url with mplayer
+     * @param url URL
+     * @param is_playlist Whether to launch mplayer with the -playlist argument
+     * @param f (Optional) Callback function
+     **/
+    play(url, is_playlist) {
+        return new Promise(async (resolve) => {
+            if (!this.is_init) {
+                //stop( () => loadfile(url, is_playlist, f) );
+                await this.loadfile(url, is_playlist);
+                resolve();
+            }
+            else {
+                this.init_mplayer(url, is_playlist);
+                resolve();
+            }
+        });
+    }
+    /**
+     * @method quit
+     * @description Quit mplayer
+     * @param f (Optional) Callback function
+     **/
+    async quit() {
+        return this.mplayer_stdin('quit', true);
+    }
+    /**
+     * @method pause
+     * @description Pause mplayer
+     * @param f (Optional) Callback function
+     **/
+    async pause() {
+        return this.mplayer_stdin('pause', false);
+    }
+    /**
+     * @method volume
+     * @description Change volume
+     * @param n Relative value to change volume by preceded by sign
+     **/
+    async volume(n) {
+        return this.mplayer_stdin(`volume ${n} 0`);
+    }
+    /**
+     * @method stop
+     * @description Stop mplayer
+     * @param f (Optional) Callback function
+     **/
+    async stop() {
+        return this.mplayer_stdin('stop', true);
     }
 }
-function init_mplayer(url, is_playlist, f) {
-    if (mplayer !== undefined)
-        throw Error('Mplayer already initiated.');
-    const cmd = mplayer_cmd(CONFIG.mplayer.path);
-    const args = ['-cache', CACHE_SIZE, '-slave'];
-    const options = {
-        detached: true,
-        stdio: ['pipe', 'ignore', 'ignore']
-    };
-    mplayer = is_playlist
-        ? child_process_1.spawn(cmd, args.concat('-playlist', url), options)
-        : child_process_1.spawn(cmd, args.concat(url), options);
-    if (f)
-        setTimeout(f, WAIT_IO);
-}
-function loadfile(url, is_playlist, f) {
-    const cmd = is_playlist ? 'loadlist' : 'loadfile';
-    mplayer_stdin(`${cmd} ${url} 0`, f, true);
-}
-/**
- * @method play
- * @description Play a url with mplayer
- * @param url URL
- * @param is_playlist Whether to launch mplayer with the -playlist argument
- * @param f (Optional) Callback function
- **/
-function play(url, is_playlist, f) {
-    return new Promise((resolve) => {
-        if (mplayer !== undefined)
-            //stop( () => loadfile(url, is_playlist, f) );
-            loadfile(url, is_playlist, f);
-        else
-            init_mplayer(url, is_playlist, f);
-        resolve();
-    });
-}
-exports.play = play;
-/**
- * @method quit
- * @description Quit mplayer
- * @param f (Optional) Callback function
- **/
-function quit(f) {
-    mplayer_stdin('quit', f, true);
-}
-exports.quit = quit;
-/**
- * @method pause
- * @description Pause mplayer
- * @param f (Optional) Callback function
- **/
-function pause(f) {
-    mplayer_stdin('pause', f, false);
-}
-exports.pause = pause;
-/**
- * @method volume
- * @description Change volume
- * @param n Relative value to change volume by preceded by sign
- **/
-function volume(n) {
-    mplayer_stdin(`volume ${n} 0`);
-}
-exports.volume = volume;
-/**
- * @method stop
- * @description Stop mplayer
- * @param f (Optional) Callback function
- **/
-function stop(f) {
-    mplayer_stdin('stop', f, true);
-}
-exports.stop = stop;
+exports.default = new Mplayer();

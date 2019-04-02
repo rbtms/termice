@@ -2,7 +2,7 @@
 * Query and parse radio-browser open radio directory
 * @module Radio
 **/
-import {default as request} from 'request';
+//import {default as request} from 'request';
 import { RadioEntry, StringJSON, AnyJSON } from './interfaces';
 
 
@@ -31,7 +31,7 @@ export function search_radio(search :string, mode :string) :Promise<RadioEntry[]
             url    : (MODE_URL[mode] || MODE_URL[DEF_MODE]) + search.split(' ').join('+')
         };
         
-        request(options, (err :string, _, body :string) => {
+        require('request')(options, (err :string, _ :any, body :string) => {
             if(err) reject(err);
             
             const json = JSON.parse(body);

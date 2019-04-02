@@ -14,13 +14,13 @@ export const CONFIG_PATH = './src/js/config.json';
 /**
  * @description Read configuration file
  **/
-export function read_config(path :string) :AnyJSON {
+export function read_config() :AnyJSON {
   try {
-    const config = JsonFile.readFileSync(path);
+    const config = JsonFile.readFileSync(CONFIG_PATH);
     return Object.freeze(config);
   }
   catch(err) {
-    throw Error(`Couldn't load ${path}: ${err})`);
+    throw Error(`Couldn't load ${CONFIG_PATH}: ${err})`);
   }
 }
 

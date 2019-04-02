@@ -40,10 +40,10 @@ import * as Blessed from 'blessed';
 import Minimist     from 'minimist';
 
 import * as Util    from './lib/util';
-import * as Mplayer from './lib/mplayer';
 import * as Icecast from './lib/icecast';
 import * as Radio   from './lib/radio';
 import * as Style   from './lib/style';
+import Mplayer      from './lib/mplayer';
 
 import { State, Config, Entry } from './lib/interfaces';
 
@@ -149,7 +149,6 @@ async function play_url(s :State, entry :Entry) :Promise<State> {
 
   return set_flags(s2, { is_playing: true });
 }
-
 
 /**
  * @description Set current tab in the header
@@ -402,8 +401,6 @@ function set_events(s :State) :void {
 
 function init(s :State) :void {
   set_events(s);
-  //set_header(s);
-
   s.scr.render();
 
   search_streams(s, s.flags.last_search);
@@ -412,7 +409,7 @@ function init(s :State) :void {
 function init_state(config :Config, argv :any) :State {
   const scr = Blessed.screen({
     autoPadding : true,
-    debug       : true,
+    debug       : false,
     fullUnicode : true,
     //forceUnicode: true,
     smartCSR    : true,
@@ -456,18 +453,19 @@ function init_state(config :Config, argv :any) :State {
  **/
 function main() :void {
   const available_opts = ['h', 'q', 's', '_'];
+  const argv = Minimist(process.argv);
 
-  const config = Util.read_config(Util.CONFIG_PATH);
-  const argv   = Minimist(process.argv);
-  const s = init_state(config, argv);
-
-
-  if(argv.h
+  if(
+    argv.h
     || !!Object.keys(argv).find( (opt :string) => !available_opts.includes(opt) )
   )
     print_usage_and_exit();
-  else
+  else {
+    const config = Util.read_config();
+    const s      = init_state(config, argv);
+
     init(s);
+  }
 }
 
 main();

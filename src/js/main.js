@@ -51,10 +51,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Blessed = __importStar(require("blessed"));
 const minimist_1 = __importDefault(require("minimist"));
 const Util = __importStar(require("./lib/util"));
-const Mplayer = __importStar(require("./lib/mplayer"));
 const Icecast = __importStar(require("./lib/icecast"));
 const Radio = __importStar(require("./lib/radio"));
 const Style = __importStar(require("./lib/style"));
+const mplayer_1 = __importDefault(require("./lib/mplayer"));
 /**
  * TODO
  *
@@ -81,7 +81,7 @@ Options:
  * @description Stop the player and exit
  **/
 async function exit(s, line) {
-    await Mplayer.quit();
+    await mplayer_1.default.quit();
     // Exit interface
     s.scr.destroy();
     // Print exit line if there is one
@@ -94,7 +94,7 @@ async function exit(s, line) {
  * @description Stop the player
  **/
 async function stop(s) {
-    await Mplayer.stop();
+    await mplayer_1.default.stop();
     const s2 = set_flags(s, { is_playing: !s.flags.is_playing });
     // Update title
     set_title(s2);
@@ -117,7 +117,7 @@ function set_stream_list(s, list) {
  * @description Pause/Resume the player
  **/
 async function pause(s) {
-    await Mplayer.pause();
+    await mplayer_1.default.pause();
     // Update pause key text
     // Renders screen
     set_header_title(s);
@@ -128,7 +128,7 @@ async function pause(s) {
  * @param entry Table entry
  **/
 async function play_url(s, entry) {
-    await Mplayer.play(entry.url, entry.is_playlist);
+    await mplayer_1.default.play(entry.url, entry.is_playlist);
     const s2 = set_flags(s, {
         is_playing: false,
         is_paused: false
@@ -300,8 +300,8 @@ function set_events(s) {
         const s2 = await stop(s);
         set_events(s2);
     });
-    s.scr.key([s.config.keys.screen.vol_up], () => Mplayer.volume('+1'));
-    s.scr.key([s.config.keys.screen.vol_down], () => Mplayer.volume('-1'));
+    s.scr.key([s.config.keys.screen.vol_up], () => mplayer_1.default.volume('+1'));
+    s.scr.key([s.config.keys.screen.vol_down], () => mplayer_1.default.volume('-1'));
     s.scr.key([s.config.keys.screen.input], async () => {
         const s2 = await toggle_input(s);
         set_events(s2);
@@ -341,14 +341,13 @@ function set_events(s) {
 }
 function init(s) {
     set_events(s);
-    //set_header(s);
     s.scr.render();
     search_streams(s, s.flags.last_search);
 }
 function init_state(config, argv) {
     const scr = Blessed.screen({
         autoPadding: true,
-        debug: true,
+        debug: false,
         fullUnicode: true,
         //forceUnicode: true,
         smartCSR: true,
@@ -386,13 +385,14 @@ function init_state(config, argv) {
  **/
 function main() {
     const available_opts = ['h', 'q', 's', '_'];
-    const config = Util.read_config(Util.CONFIG_PATH);
     const argv = minimist_1.default(process.argv);
-    const s = init_state(config, argv);
     if (argv.h
         || !!Object.keys(argv).find((opt) => !available_opts.includes(opt)))
         print_usage_and_exit();
-    else
+    else {
+        const config = Util.read_config();
+        const s = init_state(config, argv);
         init(s);
+    }
 }
 main();

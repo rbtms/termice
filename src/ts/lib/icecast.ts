@@ -2,9 +2,8 @@
  * Query and parse Icecast and Shoutcast directories
  * @module Icecast
  **/
-import Request from 'request';
+//import Request from 'request';
 import { IcecastEntry, AnyJSON } from './interfaces';
-
 
 /**
  * @method search_xiph
@@ -20,7 +19,7 @@ export function search_xiph(search :string) :Promise<IcecastEntry[]> {
       url    : 'http://dir.xiph.org/search?search=' + search.split(' ').join('+')
     };
 
-    Request(options, (err :string, _, body :string) => {
+    require('request')(options, (err :string, _ :any, body :string) => {
       if(err) reject(err);
 
       resolve( parse_xiph(body) );
@@ -45,14 +44,13 @@ export function search_shoutcast(search :string) :Promise<IcecastEntry[]> {
       }
     };
 
-    Request(options, (err :string, _, body :string) => {
+    require('request')(options, (err :string, _ :any, body :string) => {
       if(err)
         reject(err);
 
       const json = JSON.parse(body);
       resolve( parse_shoutcast(json) );
     });
-
   });
 }
 
@@ -111,3 +109,4 @@ function parse_shoutcast(json :AnyJSON) :IcecastEntry[] {
     is_playlist : true
   }));
 }
+

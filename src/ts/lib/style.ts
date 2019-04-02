@@ -5,7 +5,6 @@
 import * as Util from './util.js';
 import { StringJSON, AnyJSON } from './interfaces';
 
-
 function format_init_header(option :StringJSON) :string {
   const def_style = '{white-bg}{black-fg}';
   const pad = ' ';
@@ -21,13 +20,13 @@ function format_init_header(option :StringJSON) :string {
 /*
  * Constants
  */
-const config = Util.read_config(Util.CONFIG_PATH);
+const config = Util.read_config();
 
 export const style :AnyJSON = {
   header: {
     top     : 0,
     left    : 1,
-    width   : '98%',
+    width   : '99%',
     height  : '8%',
     content : format_init_header(config.header),
     tags    : true,
@@ -56,7 +55,7 @@ export const style :AnyJSON = {
   stream_table: {
     top     : 3,
     left    : 1,
-    width   : '98%',
+    width   : '99%',
     height  : '90%',
     content : '  Loading...',
     align   : 'left',
@@ -102,7 +101,7 @@ export const style :AnyJSON = {
   input: {
     bottom  : 0,
     left    : 1,
-    width   : '98%',
+    width   : '99%',
     height  : 3,
     content : 'Input',
     tags    : true,
@@ -112,7 +111,6 @@ export const style :AnyJSON = {
     },
 
     hidden: true,
-
     inputOnFocus: true,
 
     border: {
@@ -128,7 +126,7 @@ export const style :AnyJSON = {
   loading: {
     bottom  : 0,
     left    : 1,
-    width   : '98%',
+    width   : '99%',
     height  : 3,
     content : 'Input',
     tags    : true,
@@ -151,3 +149,4 @@ export const style :AnyJSON = {
     }
   }
 };
+

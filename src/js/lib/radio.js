@@ -1,13 +1,5 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-/**
-* Query and parse radio-browser open radio directory
-* @module Radio
-**/
-const request_1 = __importDefault(require("request"));
 const DEF_MODE = 'name';
 const MODE_URL = {
     name: 'http://www.radio-browser.info/webservice/json/stations/byname/',
@@ -28,7 +20,7 @@ function search_radio(search, mode) {
             method: 'GET',
             url: (MODE_URL[mode] || MODE_URL[DEF_MODE]) + search.split(' ').join('+')
         };
-        request_1.default(options, (err, _, body) => {
+        require('request')(options, (err, _, body) => {
             if (err)
                 reject(err);
             const json = JSON.parse(body);

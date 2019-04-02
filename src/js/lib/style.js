@@ -22,12 +22,12 @@ function format_init_header(option) {
 /*
  * Constants
  */
-const config = Util.read_config(Util.CONFIG_PATH);
+const config = Util.read_config();
 exports.style = {
     header: {
         top: 0,
         left: 1,
-        width: '98%',
+        width: '99%',
         height: '8%',
         content: format_init_header(config.header),
         tags: true,
@@ -51,7 +51,7 @@ exports.style = {
     stream_table: {
         top: 3,
         left: 1,
-        width: '98%',
+        width: '99%',
         height: '90%',
         content: '  Loading...',
         align: 'left',
@@ -90,7 +90,7 @@ exports.style = {
     input: {
         bottom: 0,
         left: 1,
-        width: '98%',
+        width: '99%',
         height: 3,
         content: 'Input',
         tags: true,
@@ -110,7 +110,7 @@ exports.style = {
     loading: {
         bottom: 0,
         left: 1,
-        width: '98%',
+        width: '99%',
         height: 3,
         content: 'Input',
         tags: true,

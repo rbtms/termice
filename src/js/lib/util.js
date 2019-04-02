@@ -16,13 +16,13 @@ exports.CONFIG_PATH = './src/js/config.json';
 /**
  * @description Read configuration file
  **/
-function read_config(path) {
+function read_config() {
     try {
-        const config = JsonFile.readFileSync(path);
+        const config = JsonFile.readFileSync(exports.CONFIG_PATH);
         return Object.freeze(config);
     }
     catch (err) {
-        throw Error(`Couldn't load ${path}: ${err})`);
+        throw Error(`Couldn't load ${exports.CONFIG_PATH}: ${err})`);
     }
 }
 exports.read_config = read_config;
