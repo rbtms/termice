@@ -2,7 +2,7 @@
  * Query and parse Icecast and Shoutcast directories
  * @module Mplayer
  **/
-import {exec, spawn} from 'child_process';
+import {exec, spawnSync} from 'child_process';
 import * as Util from './util.js';
 
 class Mplayer {
@@ -59,7 +59,7 @@ class Mplayer {
    * @param f            (Optional) Callback function
    * @param call_no_init Call the callback even if mplayer is not initiated
    **/
-  async mplayer_stdin(line :string, call_no_init? :boolean) :Promise<void> {
+  mplayer_stdin(line :string, call_no_init? :boolean) :Promise<void> {
     return new Promise( (resolve, reject) => {
       if(!this.is_init) {
         this.pipe.stdin.write(line + '\n');
@@ -86,8 +86,8 @@ class Mplayer {
       };
 
       this.pipe = is_playlist
-        ? spawn(this.bin_path, args.concat('-playlist', url), options)
-        : spawn(this.bin_path, args.concat(url), options);
+        ? spawnSync(this.bin_path, args.concat('-playlist', url), options)
+        : spawnSync(this.bin_path, args.concat(url), options);
 
       this.is_init = true;
     }
@@ -95,7 +95,7 @@ class Mplayer {
 
   async loadfile(url :string, is_playlist :boolean) :Promise<void> {
     const cmd = is_playlist ? 'loadlist' : 'loadfile';
-    await this.mplayer_stdin(`${cmd} ${url} 0`, true);
+    return this.mplayer_stdin(`${cmd} ${url} 0`, true);
   }
 
   /**
@@ -106,11 +106,16 @@ class Mplayer {
    * @param f (Optional) Callback function
    **/
   play(url :string, is_playlist :boolean) :Promise<void> {
-    return new Promise( async (resolve) => {
-      if(!this.is_init) {
+    return new Promise( async (resolve, reject) => {
+      if(this.is_init) {
         //stop( () => loadfile(url, is_playlist, f) );
-        await this.loadfile(url, is_playlist);
-        resolve();
+        try {
+          await this.loadfile(url, is_playlist);
+          resolve();
+        }
+        catch(err) {
+          reject(err);
+        }
       }
       else {
         this.init_mplayer(url, is_playlist);

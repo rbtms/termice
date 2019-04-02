@@ -53,7 +53,7 @@ class Mplayer {
      * @param f            (Optional) Callback function
      * @param call_no_init Call the callback even if mplayer is not initiated
      **/
-    async mplayer_stdin(line, call_no_init) {
+    mplayer_stdin(line, call_no_init) {
         return new Promise((resolve, reject) => {
             if (!this.is_init) {
                 this.pipe.stdin.write(line + '\n');
@@ -78,14 +78,14 @@ class Mplayer {
                 stdio: ['pipe', 'ignore', 'ignore']
             };
             this.pipe = is_playlist
-                ? child_process_1.spawn(this.bin_path, args.concat('-playlist', url), options)
-                : child_process_1.spawn(this.bin_path, args.concat(url), options);
+                ? child_process_1.spawnSync(this.bin_path, args.concat('-playlist', url), options)
+                : child_process_1.spawnSync(this.bin_path, args.concat(url), options);
             this.is_init = true;
         }
     }
     async loadfile(url, is_playlist) {
         const cmd = is_playlist ? 'loadlist' : 'loadfile';
-        await this.mplayer_stdin(`${cmd} ${url} 0`, true);
+        return this.mplayer_stdin(`${cmd} ${url} 0`, true);
     }
     /**
      * @method play
@@ -95,11 +95,16 @@ class Mplayer {
      * @param f (Optional) Callback function
      **/
     play(url, is_playlist) {
-        return new Promise(async (resolve) => {
-            if (!this.is_init) {
+        return new Promise(async (resolve, reject) => {
+            if (this.is_init) {
                 //stop( () => loadfile(url, is_playlist, f) );
-                await this.loadfile(url, is_playlist);
-                resolve();
+                try {
+                    await this.loadfile(url, is_playlist);
+                    resolve();
+                }
+                catch (err) {
+                    reject(err);
+                }
             }
             else {
                 this.init_mplayer(url, is_playlist);

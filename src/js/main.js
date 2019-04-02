@@ -65,6 +65,12 @@ const mplayer_1 = __importDefault(require("./lib/mplayer"));
  * Add podcasts
  * Add free music sources
  **/
+function force_exit(s, smth) {
+    s.scr.destroy();
+    console.log(smth);
+    throw 'Force exit';
+    process.exit();
+}
 // Usage
 function print_usage_and_exit() {
     console.log(`
@@ -87,8 +93,7 @@ async function exit(s, line) {
     // Print exit line if there is one
     if (line)
         throw Error(line);
-    else
-        process.exit();
+    process.exit();
 }
 /**
  * @description Stop the player
@@ -111,7 +116,13 @@ function set_flags(s, flags) {
     };
 }
 function set_stream_list(s, list) {
-    return Object.assign(s, { stream_list: list });
+    return {
+        scr: s.scr,
+        comp: s.comp,
+        config: s.config,
+        stream_list: list.slice(),
+        flags: s.flags
+    };
 }
 /**
  * @description Pause/Resume the player
@@ -128,14 +139,21 @@ async function pause(s) {
  * @param entry Table entry
  **/
 async function play_url(s, entry) {
-    await mplayer_1.default.play(entry.url, entry.is_playlist);
-    const s2 = set_flags(s, {
-        is_playing: false,
-        is_paused: false
-    });
-    // Renders screen
-    set_header_title(s2, entry.name);
-    return set_flags(s2, { is_playing: true });
+    try {
+        await mplayer_1.default.play(entry.url, entry.is_playlist);
+        const s2 = set_flags(s, {
+            is_playing: false,
+            is_paused: false
+        });
+        // Renders screen
+        set_header_title(s2, entry.name);
+        return set_flags(s2, { is_playing: true });
+    }
+    catch (err) {
+        force_exit(s, err);
+        // TODO: Mock
+        return s;
+    }
 }
 /**
  * @description Set current tab in the header
@@ -329,6 +347,7 @@ function set_events(s) {
     // Stream table events
     s.comp.stream_table.on('select', async (_, i) => {
         const entry = s.stream_list[i - 1];
+        //force_exit(s, entry);
         const s2 = await play_url(s, entry);
         set_events(s2);
     });
@@ -339,10 +358,11 @@ function set_events(s) {
         set_events(s2);
     });
 }
-function init(s) {
+async function init(s) {
     set_events(s);
     s.scr.render();
-    search_streams(s, s.flags.last_search);
+    const s2 = await search_streams(s, s.flags.last_search);
+    set_events(s2);
 }
 function init_state(config, argv) {
     const scr = Blessed.screen({

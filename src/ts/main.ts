@@ -58,6 +58,13 @@ import { State, Config, Entry } from './lib/interfaces';
  * Add podcasts
  * Add free music sources
  **/
+function force_exit(s :any, smth :any) :void {
+  s.scr.destroy();
+  console.log(smth);
+
+  throw 'Force exit';
+  process.exit();
+}
 
 // Usage
 function print_usage_and_exit() :void {
@@ -85,8 +92,8 @@ async function exit(s :State, line? :string) :Promise<void> {
   // Print exit line if there is one
   if(line)
     throw Error(line);
-  else
-    process.exit();
+
+  process.exit();
 }
 
 /**
@@ -116,7 +123,13 @@ function set_flags(s :State, flags :any) :State {
 }
 
 function set_stream_list(s :State, list :Entry[]) :State {
-  return Object.assign(s, { stream_list: list });
+  return {
+    scr         : s.scr,
+    comp        : s.comp,
+    config      : s.config,
+    stream_list : list.slice(),
+    flags       : s.flags
+  };
 }
 
 /**
@@ -137,17 +150,24 @@ async function pause(s :State) :Promise<State> {
  * @param entry Table entry
  **/
 async function play_url(s :State, entry :Entry) :Promise<State> {
-  await Mplayer.play(entry.url, entry.is_playlist);
+  try {
+    await Mplayer.play(entry.url, entry.is_playlist);
 
-  const s2 = set_flags(s, {
-    is_playing : false,
-    is_paused  : false
-  });
+    const s2 = set_flags(s, {
+      is_playing : false,
+      is_paused  : false
+    });
 
-  // Renders screen
-  set_header_title(s2, entry.name);
+    // Renders screen
+    set_header_title(s2, entry.name);
 
-  return set_flags(s2, { is_playing: true });
+    return set_flags(s2, { is_playing: true });
+  }
+  catch(err) {
+    force_exit(s, err);
+    // TODO: Mock
+    return s;
+  }
 }
 
 /**
@@ -386,6 +406,8 @@ function set_events(s :State) :void {
   // Stream table events
   s.comp.stream_table.on('select', async (_ :any, i :number) => {
     const entry :Entry = s.stream_list[i-1];
+    //force_exit(s, entry);
+
     const s2 = await play_url(s, entry);
     set_events(s2);
   });
@@ -399,11 +421,12 @@ function set_events(s :State) :void {
   });
 }
 
-function init(s :State) :void {
+async function init(s :State) :Promise<void> {
   set_events(s);
   s.scr.render();
 
-  search_streams(s, s.flags.last_search);
+  const s2 = await search_streams(s, s.flags.last_search);
+  set_events(s2);
 }
 
 function init_state(config :Config, argv :any) :State {
