@@ -17,16 +17,15 @@ class Mplayer {
     constructor() {
         const config = Util.read_config();
         // Default cache in kb
-        this.def_cache = '1024';
+        const def_cache = '1024';
         // Time to wait after IO
-        this.def_wait_io = 100;
+        const def_wait_io = 100;
         // Mplayer cache size in kb
-        this.cache_size = config.mplayer.cache || this.def_cache;
+        this.cache_size = config.mplayer.cache || def_cache;
         // Time to wait after IO in ms
-        this.wait_io = config.mplayer.wait_io || this.def_wait_io;
+        this.wait_io = config.mplayer.wait_io || def_wait_io;
         // Path to the mplayer binary
         this.bin_path = config.mplayer.path || 'mplayer';
-        this.pipe;
         this.is_init = false;
     }
     /**

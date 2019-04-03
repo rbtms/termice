@@ -54,7 +54,7 @@ export function format_header(
 
   const line = Object.keys(option).reduce( (acc, key) => {
     const letter = key;
-    const text   = letter == pause_key
+    const text   = letter === pause_key
       ? !is_paused
         ? 'Pause'
         : 'Resume'
@@ -162,7 +162,7 @@ export function format_stream_list(
         default:
           //exit(s, 'Unknown source: ' + src);
           //return false;
-          throw 'Unknown source: ' + src + ' ' + s;
+          throw Error(`Unknown source: ${src} ${s}`);
       }
     default:
       return add_rows_padding(rows_header, [['No results for: ' + search]]);

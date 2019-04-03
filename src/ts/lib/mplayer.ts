@@ -6,8 +6,6 @@ import {exec, spawnSync} from 'child_process';
 import * as Util from './util.js';
 
 class Mplayer {
-  def_cache   :string;
-  def_wait_io :number;
   cache_size  :string;
   wait_io     :number;
   bin_path    :string;
@@ -16,20 +14,18 @@ class Mplayer {
 
   constructor() {
     const config = Util.read_config();
-
     // Default cache in kb
-    this.def_cache   = '1024';
+    const def_cache   = '1024';
     // Time to wait after IO
-    this.def_wait_io = 100; 
+    const def_wait_io = 100;
 
     // Mplayer cache size in kb
-    this.cache_size = config.mplayer.cache   || this.def_cache;
+    this.cache_size = config.mplayer.cache   || def_cache;
     // Time to wait after IO in ms
-    this.wait_io    = config.mplayer.wait_io || this.def_wait_io;
+    this.wait_io    = config.mplayer.wait_io || def_wait_io;
     // Path to the mplayer binary
     this.bin_path   = config.mplayer.path    || 'mplayer';
 
-    this.pipe;
     this.is_init = false;
   }
 
@@ -47,7 +43,7 @@ class Mplayer {
           reject(err);
         else
           resolve();
-      })
+      });
     });
   }
 
@@ -57,7 +53,7 @@ class Mplayer {
    * @param line         String to be written
    * @param call_no_init WHether to succeed even if the mplayer pipe is not initiated
    **/
-  mplayer_stdin(line :string, call_no_init :boolean = false) :Promise<void> {
+  mplayer_stdin(line :string, call_no_init = false) :Promise<void> {
     return new Promise( (resolve, reject) => {
       if(this.is_init) {
         this.pipe.stdin.write(line + '\n');

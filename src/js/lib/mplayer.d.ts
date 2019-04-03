@@ -1,6 +1,4 @@
 declare class Mplayer {
-    def_cache: string;
-    def_wait_io: number;
     cache_size: string;
     wait_io: number;
     bin_path: string;

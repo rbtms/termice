@@ -13,6 +13,9 @@
         
         "member-ordering": false,
         
+        // Enforce the marking of methods as public, private or protected
+        "member-access": false,
+        
         //"no-any": true,
         
         // Disallow the use of empty interfaces
@@ -32,9 +35,6 @@
 
         // Disallow the reasignment of function parameters
         "no-parameter-reassignment": true,
-        
-        // Disallow unnecessary type assertions
-        "no-unnecessary-type-assertion": true,
         
         // Disallow var module = require('module') import statements
         "no-var-requires": true,
@@ -62,7 +62,8 @@
     /**
     * Functionality
     **/
-            "await-promise": true,
+        // Warns for an awaited value that is not a promise
+        "await-promise": true,
 
         // Enforces braces for if/for/while statements
         // Reason: This disallows single-line braceless if statements
@@ -84,7 +85,7 @@
         // Reason: Eval is dangerous and a security threat
         "no-eval": true,
     
-            "no-floating-promises": true,
+        "no-floating-promises": true,
         
         // Disallow for-in loops on arrays
         // Reason: C-Like or for-on loops are safer
@@ -94,19 +95,18 @@
         // Reason: Global dependencies are useful for developing
         //"no-implicit-dependencies": true,
         
-            // Enforces mutability on function parameters
-            // Reason: Makes the code easier to read and understand
-            "no-null-keyword": true,
-            
-            "no-shadowed-variable": true,
-            "no-string-literal": true,
-            "no-string-throw": true,
-            "no-switch-case-fall-through": true,
-            "no-submodule-imports": true,
+        // Enforces mutability on function parameters
+        // Reason: Makes the code easier to read and understand
+        "no-null-keyword": true,
+        
+        "no-shadowed-variable": true,
+        "no-string-literal": true,
+        "no-string-throw": true,
+        "no-switch-case-fall-through": true,
+        "no-submodule-imports": true,
         
         // Disallows the use of "return await"
-        // Reason: An await function is going to return a promise anyways
-        "no-return-await": true,
+        "no-return-await": false,
         
         // Disallows missing elements in arrays
         // Reason: They are usually bugs
@@ -123,10 +123,6 @@
             //"no-unsafe-any": true,
             //"no-unbound-method": true,
         
-        // Disallows the use of unused variables
-        // Reason: They are usually variable naming bugs
-        "no-unused-variable": [true, "check-parameters"],
-
             // Disallows the use of var
             // Reason: It's still useful to optimize C-Like for loops
             // "no-var-keyword": true
@@ -140,8 +136,8 @@
         // Require the specification of the radix on parseInt
         "radix": false,
 
-            // Enforces same-type variables on operands
-            "restrict-plus-operands": true,
+        // Enforces same-type variables on operands
+        "restrict-plus-operands": true,
 
         // Enforces the use of boolean expressions on conditionals, !, && and ||
         // Reason: !  expressions are useful for falsy values checking
@@ -170,9 +166,6 @@
     /**
     * Maintainability
     **/
-        // Disallows the use of deprecated APIs
-        "deprecation": true,
-        
         // Enforces a newline after the last line
         // Reason: Some programs have problems accesing the last line if it's not followed by a newline
         "eofline": true,
@@ -185,8 +178,8 @@
             //"no-duplicate-imports": true,
         
         // Disallows importing modules with require()
-        // Reason: ES6 imports are more portable and versatile
-        "no-require-imports": true,
+        // require() often improves startup performance allowing lazy imports
+        "no-require-imports": false,
         
         // Require const declarations when possible
         // Reason: It's more logical to declarate variables with const when they aren't
@@ -208,7 +201,7 @@
         "array-type": [true, "array"],
         
         // Enforces use of parentheses around parameters on arrow functions
-        "arrow-parens": true,
+        "arrow-parens": false,
         
         // Requires simple returns from arrow functions to omit braces and the return keyword
         "arrow-return-shorthand": [true, "multiline"],
@@ -237,8 +230,8 @@
         // Reason: Comments are already aligned, there is no need to align the * themselves
         "jsdoc-format": false,
         
-            // Enforces a newline before return statements on multiline functions
-            "newline-before-return": true,
+        // Enforces a newline before return statements on multiline functions
+        "newline-before-return": false,
         
         // Enforces chained methods to be on separate lines
         "newline-per-chained-call": false,
@@ -291,9 +284,6 @@
         
         // Enforces the use of string templates instead of concatenation on large statements
         "prefer-template": [true, "allow-single-concat"],
-        
-        // Enforces return on void functions and return undefined on functions that return a value
-        "return-undefined": true,
         
         // Enforces the use of semicolons
         "semicolon": true,

@@ -66,7 +66,7 @@ async function force_exit(s :State, smth :any) :Promise<void> {
   s.scr.destroy();
   console.log(smth);
 
-  throw 'Force exit';
+  throw Error('Force exit');
   process.exit();
 }
 
@@ -91,7 +91,7 @@ Options:
  * @param s State
  * @param line Exit line
  **/
-async function exit(s :State, line :string = '') :Promise<void> {
+async function exit(s :State, line = '') :Promise<void> {
   await Mplayer.quit();
   
   // Exit interface
@@ -211,7 +211,7 @@ function set_header(s :State) :void {
  * @param s State
  * @param stream_name Name of the stream
  **/
-function set_title(s :State, stream_name :string = '') :void {
+function set_title(s :State, stream_name = '') :void {
   // Keep the old title if it's playing
   if(!s.flags.is_playing)
     s.scr.title = Util.format_title(s, stream_name);
@@ -222,7 +222,7 @@ function set_title(s :State, stream_name :string = '') :void {
  * @param s State
  * @param stream_name Name of the stream
  */
-function set_header_title(s: State, stream_name :string = '') :void {
+function set_header_title(s: State, stream_name = '') :void {
   set_header(s);
   set_title(s, stream_name);
 
@@ -298,7 +298,7 @@ async function search_streams(s :State, search :string) :Promise<State> {
     last_search   : search,
     last_tab      : s.flags.source,
     current_index : 0
-  })
+  });
 
   const list :Entry[] = await query_streams(s2, search);
 
@@ -524,7 +524,7 @@ function init_state(config :Config, argv :any) :State {
       is_paused     : false,
       is_input      : false
     }
-  }
+  };
 }
 
 /**

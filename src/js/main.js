@@ -70,7 +70,7 @@ async function force_exit(s, smth) {
     await mplayer_1.default.quit();
     s.scr.destroy();
     console.log(smth);
-    throw 'Force exit';
+    throw Error('Force exit');
     process.exit();
 }
 /**
