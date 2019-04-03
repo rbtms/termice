@@ -2,26 +2,47 @@
  * Util
  * @module Util
  **/
-import * as JsonFile from 'jsonfile';
+//import * as JsonFile from 'jsonfile';
 import {
   State,
   Entry,
   StringJSON,
   AnyJSON } from './interfaces';
 
-export const CONFIG_PATH = './src/js/config.json';
+export const CONFIG_PATH = './src/js/conf/config.json';
+export const STYLES_PATH = './src/js/conf/styles.json';
 
 /**
  * @description Read configuration file
  **/
-export function read_config() :AnyJSON {
+export function read_json(path :string) :AnyJSON {
   try {
-    const config = JsonFile.readFileSync(CONFIG_PATH);
-    return Object.freeze(config);
+    const json = JSON.parse( require('fs').readFileSync(path) );
+    return Object.freeze(json);
   }
   catch(err) {
-    throw Error(`Couldn't load ${CONFIG_PATH}: ${err})`);
+    throw Error(`Couldn't load ${path}: ${err})`);
   }
+}
+
+export function read_config() :AnyJSON {
+  return read_json(CONFIG_PATH);
+}
+
+export function read_styles() :AnyJSON {
+  return read_json(STYLES_PATH);
+}
+
+export function format_init_header(option :StringJSON) :string {
+  const def_style = '{white-bg}{black-fg}';
+  const pad = ' ';
+
+  const line = Object.keys(option).reduce( (acc, key) =>
+    acc + ` ${def_style} ${key} {/} ${option[key]}${pad}`
+    , '');
+
+  // Remove last space
+  return line.substr(0, line.length-1);
 }
 
 /**

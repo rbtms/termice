@@ -20,39 +20,31 @@
  *
  *
  * IN PROGRESS
- * @todo Catch errors
+ * @todo Log errors
  * @todo Test file
  *
  * ERROR
- * @todo Cache loop errors
  * @todo Remove layout-breaking characters
  *
  * TODO
  * @todo Add mplayer to deb dependencies
  * @todo Volume bar
  * @todo Add option to add non-selectable descriptions
+ *
+ * IDEAS
+ * @todo Update currently playing track information
+ * @todo Add currently playing bar
+ * @todo Add free music sources
   **/
 import Minimist     from 'minimist';
 
 import * as Util    from './lib/util';
 import * as Icecast from './lib/icecast';
 import * as Radio   from './lib/radio';
-import * as Style   from './lib/style';
 import Mplayer      from './lib/mplayer';
 
 import { State, Config, Entry } from './lib/interfaces';
 
-
-/**
- * TODO
- *
- * Update currently playing track information
- * Add currently playing bar
- * Update frequently
- *
- * Add podcasts
- * Add free music sources
- **/
 
 /**
  * TODO: Remove this function in favor of quit
@@ -380,8 +372,10 @@ async function input_handler(s :State, line :string) :Promise<State> {
  * @param s State
  **/
 function set_events(s :State) :void {
-  // Delete previous select event as there doesnt
-  // seem to be any elegant way to do it
+  /*
+   * Delete previous select event as there doesnt
+   * seem to be any elegant way to do it
+   */
   s.scr.unkey( [ s.config.keys.screen.quit     ]);
   s.scr.unkey( [ s.config.keys.screen.pause    ]);
   s.scr.unkey( [ s.config.keys.screen.stop     ]);
@@ -404,17 +398,23 @@ function set_events(s :State) :void {
   // -----------------------------------------------------
 
   // Screen events
-  s.scr.onceKey( [ s.config.keys.screen.quit     ], () => exit(s)  ); // Discard arguments
-  s.scr.onceKey( [ s.config.keys.screen.pause    ], async () => {
+  s.scr.onceKey( [ s.config.keys.screen.quit ], () =>
+    exit(s)
+  );
+  s.scr.onceKey( [ s.config.keys.screen.pause ], async () => {
     const s2 = await pause(s);
     set_events(s2);
   });
-  s.scr.onceKey( [ s.config.keys.screen.stop     ], async () => {
+  s.scr.onceKey( [ s.config.keys.screen.stop ], async () => {
     const s2 = await stop(s);
     set_events(s2);
   });
-  s.scr.onceKey( [ s.config.keys.screen.vol_up   ], () => Mplayer.volume('+1') );
-  s.scr.onceKey( [ s.config.keys.screen.vol_down ], () => Mplayer.volume('-1') );
+  s.scr.onceKey( [ s.config.keys.screen.vol_up ], () =>
+    Mplayer.volume('+1')
+  );
+  s.scr.onceKey( [ s.config.keys.screen.vol_down ], () =>
+    Mplayer.volume('-1')
+  );
 
   // Icecast tab
   s.scr.onceKey( s.config.keys.screen.icecast, async () => {
@@ -471,7 +471,9 @@ function set_events(s :State) :void {
  */
 async function init(s :State) :Promise<void> {
   set_events(s);
-  s.scr.render();
+
+  // TODO: Have a look at this render (100ms startup time)
+  set_header_title(s);
 
   const s2 = await search_streams(s, s.flags.last_search);
   set_events(s2);
@@ -482,7 +484,7 @@ async function init(s :State) :Promise<void> {
  * @param config Configuration file
  * @param argv Command line arguments
  */
-function init_state(config :Config, argv :any) :State {
+function init_state(config :Config, argv :any, styles :any) :State {
   // Declare here in order to reduce startup time by 50ms or so
   const Blessed = require('blessed');
 
@@ -495,12 +497,15 @@ function init_state(config :Config, argv :any) :State {
     //warnings: true
   });
 
+  // Set initial header
+  styles.header.content = Util.format_init_header(config.header);
+
   // Blessed components
   const comp = {
-    header       : Blessed.listbar  (Style.style.header),
-    stream_table : Blessed.listtable(Style.style.stream_table),
-    input        : Blessed.textarea (Style.style.input),
-    loading      : Blessed.loading  (Style.style.loading)
+    header       : Blessed.listbar  (styles.header),
+    stream_table : Blessed.listtable(styles.stream_table),
+    input        : Blessed.textarea (styles.input),
+    loading      : Blessed.loading  (styles.loading)
   };
 
   scr.append(comp.header);
@@ -541,7 +546,8 @@ function main() :void {
     print_usage_and_exit();
   else {
     const config = Util.read_config();
-    const s      = init_state(config, argv);
+    const styles = Util.read_styles();
+    const s      = init_state(config, argv, styles);
 
     init(s);
   }

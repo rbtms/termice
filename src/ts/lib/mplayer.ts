@@ -2,7 +2,7 @@
  * Query and parse Icecast and Shoutcast directories
  * @module Mplayer
  **/
-import {exec, spawnSync} from 'child_process';
+import {exec, spawn} from 'child_process';
 import * as Util from './util.js';
 
 class Mplayer {
@@ -86,8 +86,8 @@ class Mplayer {
       };
 
       this.pipe = is_playlist
-        ? spawnSync(this.bin_path, args.concat('-playlist', url), options)
-        : spawnSync(this.bin_path, args.concat(url), options);
+        ? spawn(this.bin_path, args.concat('-playlist', url), options)
+        : spawn(this.bin_path, args.concat(url), options);
 
       this.is_init = true;
     }
@@ -159,7 +159,10 @@ class Mplayer {
    * @description Stop mplayer
    **/
   async stop() :Promise<void> {
-    return this.mplayer_stdin('stop', true);
+    const p = this.mplayer_stdin('stop', true);
+    this.is_init = false;
+
+    return p;
   }
 }
 

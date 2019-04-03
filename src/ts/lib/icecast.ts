@@ -3,7 +3,6 @@
  * @module Icecast
  **/
 import { IcecastEntry, AnyJSON } from './interfaces';
-import { JSDOM } from 'jsdom';
 
 /**
  * @method search_xiph
@@ -55,6 +54,9 @@ export function search_shoutcast(search :string) :Promise<IcecastEntry[]> {
 }
 
 function parse_xiph(body :string) :IcecastEntry[] {
+  // Import here in order to improve startup performance (~400ms)
+  const JSDOM = require('jsdom').JSDOM;
+
   const host = 'http://dir.xiph.org';
   const playing_pos = 25;
 
