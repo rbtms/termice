@@ -10,37 +10,44 @@ declare class Mplayer {
     /**
      * @method kill
      * @description Kill all mplayer processes
-     * @param f (Optional) Callback function
      **/
     kill(): Promise<void>;
     /**
      * @method mplayer_stdin
      * @description Write a string to mplayer process stdin pipe
      * @param line         String to be written
-     * @param f            (Optional) Callback function
-     * @param call_no_init Call the callback even if mplayer is not initiated
+     * @param call_no_init WHether to succeed even if the mplayer pipe is not initiated
      **/
     mplayer_stdin(line: string, call_no_init?: boolean): Promise<void>;
+    /**
+     * @method init_player
+     * @description Initialize mplayer pipe
+     * @param url URL of the stream to play
+     * @param is_playlist Whether if the stream is a playlist or not
+     */
     init_mplayer(url: string, is_playlist: boolean): void;
+    /**
+     * @method load_line
+     * @description Load a stream
+     * @param url URL of the stream to play
+     * @param is_playlist Whether if the stream is a playlist or not
+     */
     load_file(url: string, is_playlist: boolean): Promise<void>;
     /**
      * @method play
      * @description Play a url with mplayer
      * @param url URL
      * @param is_playlist Whether to launch mplayer with the -playlist argument
-     * @param f (Optional) Callback function
      **/
     play(url: string, is_playlist: boolean): Promise<void>;
     /**
      * @method quit
      * @description Quit mplayer
-     * @param f (Optional) Callback function
      **/
     quit(): Promise<void>;
     /**
      * @method pause
      * @description Pause mplayer
-     * @param f (Optional) Callback function
      **/
     pause(): Promise<void>;
     /**
@@ -52,7 +59,6 @@ declare class Mplayer {
     /**
      * @method stop
      * @description Stop mplayer
-     * @param f (Optional) Callback function
      **/
     stop(): Promise<void>;
 }

@@ -32,7 +32,6 @@ class Mplayer {
     /**
      * @method kill
      * @description Kill all mplayer processes
-     * @param f (Optional) Callback function
      **/
     // TODO: Dont kill all processes
     async kill() {
@@ -50,8 +49,7 @@ class Mplayer {
      * @method mplayer_stdin
      * @description Write a string to mplayer process stdin pipe
      * @param line         String to be written
-     * @param f            (Optional) Callback function
-     * @param call_no_init Call the callback even if mplayer is not initiated
+     * @param call_no_init WHether to succeed even if the mplayer pipe is not initiated
      **/
     mplayer_stdin(line, call_no_init = false) {
         return new Promise((resolve, reject) => {
@@ -67,6 +65,12 @@ class Mplayer {
             }
         });
     }
+    /**
+     * @method init_player
+     * @description Initialize mplayer pipe
+     * @param url URL of the stream to play
+     * @param is_playlist Whether if the stream is a playlist or not
+     */
     init_mplayer(url, is_playlist) {
         if (this.is_init) {
             throw Error('Mplayer already initiated.');
@@ -83,6 +87,12 @@ class Mplayer {
             this.is_init = true;
         }
     }
+    /**
+     * @method load_line
+     * @description Load a stream
+     * @param url URL of the stream to play
+     * @param is_playlist Whether if the stream is a playlist or not
+     */
     async load_file(url, is_playlist) {
         const cmd = is_playlist ? 'loadlist' : 'loadfile';
         return this.mplayer_stdin(`${cmd} ${url} 0`, true);
@@ -92,7 +102,6 @@ class Mplayer {
      * @description Play a url with mplayer
      * @param url URL
      * @param is_playlist Whether to launch mplayer with the -playlist argument
-     * @param f (Optional) Callback function
      **/
     play(url, is_playlist) {
         return new Promise(async (resolve, reject) => {
@@ -115,7 +124,6 @@ class Mplayer {
     /**
      * @method quit
      * @description Quit mplayer
-     * @param f (Optional) Callback function
      **/
     async quit() {
         return this.mplayer_stdin('quit', true);
@@ -123,7 +131,6 @@ class Mplayer {
     /**
      * @method pause
      * @description Pause mplayer
-     * @param f (Optional) Callback function
      **/
     async pause() {
         return this.mplayer_stdin('pause', false);
@@ -139,7 +146,6 @@ class Mplayer {
     /**
      * @method stop
      * @description Stop mplayer
-     * @param f (Optional) Callback function
      **/
     async stop() {
         return this.mplayer_stdin('stop', true);

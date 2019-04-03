@@ -12,9 +12,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @fileOverview main.js
- * @author      nishinishi9999 (Alvaro Fernandez) {@link https://github.com/nishinishi9999}
- * @version     0.1.0
- * @description Simple terminal net stream player
+ * @author       Alvaro Fernandez {@link https://github.com/nishinishi9999}
+ * @version      0.1.0
+ * @description  Simple terminal net stream player
  * @license
  * Copyright (c) 2018 Alvaro Fernandez
  * This program is free software: you can redistribute it and/or modify
@@ -43,7 +43,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @todo Add mplayer to deb dependencies
  * @todo Volume bar
  * @todo Add option to add non-selectable descriptions
- **/
+  **/
 const minimist_1 = __importDefault(require("minimist"));
 const Util = __importStar(require("./lib/util"));
 const Icecast = __importStar(require("./lib/icecast"));
@@ -170,7 +170,7 @@ async function play_url(s, entry) {
     }
     catch (err) {
         force_exit(s, err);
-        // TODO: Mock
+        // TODO: Mock return
         return s;
     }
 }
@@ -192,6 +192,11 @@ function set_title(s, stream_name = '') {
     if (!s.flags.is_playing)
         s.scr.title = Util.format_title(s, stream_name);
 }
+/**
+ * @description Set header tab and window title
+ * @param s State
+ * @param stream_name Name of the stream
+ */
 function set_header_title(s, stream_name = '') {
     set_header(s);
     set_title(s, stream_name);
@@ -244,8 +249,7 @@ function query_streams(s, search) {
             }
         }
         default: {
-            //await exit(s, 'Not a valid source: ' + s.flags.source);
-            process.exit();
+            force_exit(s, 'Not a valid source: ' + s.flags.source);
             return query_streams(s, s.flags.last_search);
         }
     }
@@ -284,29 +288,18 @@ async function search_streams(s, search) {
 async function refresh_table(s) {
     return await search_streams(s, s.flags.last_search);
 }
-/**
- * @description Toggle the input textarea
- * @param s State
- **/
-function toggle_input(s) {
-    const tab = s.flags.is_input ? s.flags.source : 'Search';
-    const s2 = set_flags(s, { last_tab: tab, is_input: !s.flags.is_input });
-    // Toggle input
-    //s2.comp.input.toggle();
-    // Enable input
-    if (s2.flags.is_input) {
-        s2.comp.input.show();
-        s2.comp.input.input();
-        // Renders
-        //s2.comp.input.input();
-    }
-    else {
-        s2.comp.input.hide();
-        //s2.comp.input.hide();
-        //s2.comp.stream_table.focus();
-        //s2.comp.input.render();
-        //s2.comp.input.cancel()
-    }
+function show_input(s) {
+    const s2 = set_flags(s, { last_tab: 'Search' });
+    s2.comp.input.show();
+    //s2.comp.input.input();
+    s2.comp.input.focus();
+    set_header_title(s2);
+    return s2;
+}
+function hide_input(s) {
+    const s2 = set_flags(s, { last_tab: s.flags.source });
+    s2.comp.input.hide();
+    s2.comp.stream_table.focus();
     set_header_title(s2);
     return s2;
 }
@@ -324,8 +317,8 @@ async function input_handler(s, line) {
     // Query
     else {
         s.comp.input.clearValue();
-        const s2 = await search_streams(s, line);
-        return toggle_input(s2);
+        const s2 = hide_input(s);
+        return await search_streams(s2, line);
     }
 }
 /**
@@ -333,53 +326,73 @@ async function input_handler(s, line) {
  * @param s State
  **/
 function set_events(s) {
+    // Delete previous select event as there doesnt
+    // seem to be any elegant way to do it
+    s.scr.unkey([s.config.keys.screen.quit]);
+    s.scr.unkey([s.config.keys.screen.pause]);
+    s.scr.unkey([s.config.keys.screen.stop]);
+    s.scr.unkey([s.config.keys.screen.vol_up]);
+    s.scr.unkey([s.config.keys.screen.vol_down]);
+    s.scr.unkey([s.config.keys.screen.input]);
+    s.scr.unkey(s.config.keys.screen.icecast);
+    s.scr.unkey(s.config.keys.screen.shoutcast);
+    s.scr.unkey(s.config.keys.screen.radio);
+    s.scr.unkey(s.config.keys.screen.refresh);
+    s.comp.stream_table.unkey([s.config.keys.screen.input]);
+    s.comp.input.unkey([s.config.keys.screen.input]);
+    s.comp.input.unkey('enter');
+    delete s.comp.stream_table._events.select;
+    // -----------------------------------------------------
     // Screen events
-    s.scr.key([s.config.keys.screen.quit], () => exit(s)); // Discard arguments
-    s.scr.key([s.config.keys.screen.pause], async () => {
+    s.scr.onceKey([s.config.keys.screen.quit], () => exit(s)); // Discard arguments
+    s.scr.onceKey([s.config.keys.screen.pause], async () => {
         const s2 = await pause(s);
         set_events(s2);
     });
-    s.scr.key([s.config.keys.screen.stop], async () => {
+    s.scr.onceKey([s.config.keys.screen.stop], async () => {
         const s2 = await stop(s);
         set_events(s2);
     });
-    s.scr.key([s.config.keys.screen.vol_up], () => mplayer_1.default.volume('+1'));
-    s.scr.key([s.config.keys.screen.vol_down], () => mplayer_1.default.volume('-1'));
-    s.scr.key([s.config.keys.screen.input], async () => {
-        const s2 = await toggle_input(s);
-        set_events(s2);
-    });
+    s.scr.onceKey([s.config.keys.screen.vol_up], () => mplayer_1.default.volume('+1'));
+    s.scr.onceKey([s.config.keys.screen.vol_down], () => mplayer_1.default.volume('-1'));
     // Icecast tab
-    s.scr.key(s.config.keys.screen.icecast, async () => {
+    s.scr.onceKey(s.config.keys.screen.icecast, async () => {
         const s2 = await refresh_table(set_flags(s, { source: 'Icecast' }));
         set_events(s2);
     });
     // Shoutcast tab
-    s.scr.key(s.config.keys.screen.shoutcast, async () => {
+    s.scr.onceKey(s.config.keys.screen.shoutcast, async () => {
         const s2 = await refresh_table(set_flags(s, { source: 'Shoutcast' }));
         set_events(s2);
     });
     // Radio tab
-    s.scr.key(s.config.keys.screen.radio, async () => {
+    s.scr.onceKey(s.config.keys.screen.radio, async () => {
         const s2 = await refresh_table(set_flags(s, { source: 'Radio' }));
         set_events(s2);
     });
     // Refresh table
-    s.scr.key(s.config.keys.screen.refresh, async () => {
+    s.scr.onceKey(s.config.keys.screen.refresh, async () => {
         const s2 = await refresh_table(s);
         set_events(s2);
     });
     // Stream table events
     s.comp.stream_table.on('select', async (_, i) => {
         const entry = s.stream_list[i - 1];
-        //force_exit(s, entry);
         const s2 = await play_url(s, entry);
         set_events(s2);
     });
+    s.comp.stream_table.onceKey([s.config.keys.screen.input], async () => {
+        const s2 = show_input(s);
+        set_events(s2);
+    });
     // Input form events
-    s.comp.input.key('enter', async () => {
+    s.comp.input.onceKey('enter', async () => {
         const line = s.comp.input.getText().trim();
         const s2 = await input_handler(s, line);
+        set_events(s2);
+    });
+    s.comp.input.onceKey([s.config.keys.screen.input], async () => {
+        const s2 = hide_input(s);
         set_events(s2);
     });
 }
