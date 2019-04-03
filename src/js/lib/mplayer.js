@@ -53,9 +53,9 @@ class Mplayer {
      * @param f            (Optional) Callback function
      * @param call_no_init Call the callback even if mplayer is not initiated
      **/
-    mplayer_stdin(line, call_no_init) {
+    mplayer_stdin(line, call_no_init = false) {
         return new Promise((resolve, reject) => {
-            if (!this.is_init) {
+            if (this.is_init) {
                 this.pipe.stdin.write(line + '\n');
                 setTimeout(resolve, this.wait_io);
             }
@@ -83,7 +83,7 @@ class Mplayer {
             this.is_init = true;
         }
     }
-    async loadfile(url, is_playlist) {
+    async load_file(url, is_playlist) {
         const cmd = is_playlist ? 'loadlist' : 'loadfile';
         return this.mplayer_stdin(`${cmd} ${url} 0`, true);
     }
@@ -97,9 +97,9 @@ class Mplayer {
     play(url, is_playlist) {
         return new Promise(async (resolve, reject) => {
             if (this.is_init) {
-                //stop( () => loadfile(url, is_playlist, f) );
+                //stop( () => load_file(url, is_playlist, f) );
                 try {
-                    await this.loadfile(url, is_playlist);
+                    await this.load_file(url, is_playlist);
                     resolve();
                 }
                 catch (err) {
@@ -134,7 +134,7 @@ class Mplayer {
      * @param n Relative value to change volume by preceded by sign
      **/
     async volume(n) {
-        return this.mplayer_stdin(`volume ${n} 0`);
+        return this.mplayer_stdin(`volume ${n} 0`, false);
     }
     /**
      * @method stop

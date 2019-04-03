@@ -1,13 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
     if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
     result["default"] = mod;
     return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -31,10 +31,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * along with this program.  If not, see {@link https://www.gnu.org/licenses/}.
  *
  *
- * TESTING
- * @todo Go to the last index when pressing up in the first index
- * @todo Fix set_title inside set_header
- *
  * IN PROGRESS
  * @todo Catch errors
  * @todo Test file
@@ -44,11 +40,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @todo Remove layout-breaking characters
  *
  * TODO
- * @todo Reduce startup and quit overhead
- * @todo Check whether mplayer is installed
+ * @todo Add mplayer to deb dependencies
  * @todo Volume bar
+ * @todo Add option to add non-selectable descriptions
  **/
-const Blessed = __importStar(require("blessed"));
 const minimist_1 = __importDefault(require("minimist"));
 const Util = __importStar(require("./lib/util"));
 const Icecast = __importStar(require("./lib/icecast"));
@@ -65,13 +60,22 @@ const mplayer_1 = __importDefault(require("./lib/mplayer"));
  * Add podcasts
  * Add free music sources
  **/
-function force_exit(s, smth) {
+/**
+ * TODO: Remove this function in favor of quit
+ * @description Destroy the interface and force exit the program
+ * @param s State
+ * @param smth Anything to print
+ **/
+async function force_exit(s, smth) {
+    await mplayer_1.default.quit();
     s.scr.destroy();
     console.log(smth);
     throw 'Force exit';
     process.exit();
 }
-// Usage
+/**
+ * @description Print usage and exit
+ **/
 function print_usage_and_exit() {
     console.log(`
 Usage: netstreams [ARGS]
@@ -85,8 +89,10 @@ Options:
 }
 /**
  * @description Stop the player and exit
+ * @param s State
+ * @param line Exit line
  **/
-async function exit(s, line) {
+async function exit(s, line = '') {
     await mplayer_1.default.quit();
     // Exit interface
     s.scr.destroy();
@@ -97,6 +103,7 @@ async function exit(s, line) {
 }
 /**
  * @description Stop the player
+ * @param s State
  **/
 async function stop(s) {
     await mplayer_1.default.stop();
@@ -105,6 +112,11 @@ async function stop(s) {
     set_title(s2);
     return s2;
 }
+/**
+ * @description Set state flags
+ * @param s State
+ * @param flags Flags to set
+ **/
 function set_flags(s, flags) {
     const _flags = Object.assign(Object.assign({}, s.flags), flags);
     return {
@@ -115,6 +127,11 @@ function set_flags(s, flags) {
         flags: _flags
     };
 }
+/**
+ * @description Set state stream list
+ * @param s State
+ * @param list Stream list
+ **/
 function set_stream_list(s, list) {
     return {
         scr: s.scr,
@@ -126,6 +143,7 @@ function set_stream_list(s, list) {
 }
 /**
  * @description Pause/Resume the player
+ * @param s State
  **/
 async function pause(s) {
     await mplayer_1.default.pause();
@@ -136,7 +154,8 @@ async function pause(s) {
 }
 /**
  * @description Play a url with mplayer
- * @param entry Table entry
+ * @param s State
+ * @param entry Stream entry
  **/
 async function play_url(s, entry) {
     try {
@@ -157,7 +176,7 @@ async function play_url(s, entry) {
 }
 /**
  * @description Set current tab in the header
- * @param tab Current tab
+ * @param s State
  **/
 function set_header(s) {
     const line = Util.format_header(s.flags.last_tab, s.config.header, s.config.pause_key, s.flags.is_paused);
@@ -165,33 +184,31 @@ function set_header(s) {
 }
 /**
  * @description Set window title
- * @param src  Current source
- * @param name Entry name
+ * @param s State
+ * @param stream_name Name of the stream
  **/
-function set_title(s, stream_name) {
+function set_title(s, stream_name = '') {
     // Keep the old title if it's playing
     if (!s.flags.is_playing)
-        s.scr.title = stream_name === undefined
-            ? Util.format_title(s, '')
-            : Util.format_title(s, stream_name);
+        s.scr.title = Util.format_title(s, stream_name);
 }
-function set_header_title(s, stream_name) {
+function set_header_title(s, stream_name = '') {
     set_header(s);
     set_title(s, stream_name);
     s.scr.render();
 }
 /**
  * @description Display <rows> in stream_table
- * @param Array of formatted rows
+ * @param s State
+ * @param rows Array of formatted rows
  **/
 function set_rows(s, rows) {
     s.comp.stream_table.setData(rows);
 }
 /**
  * @description Get query function
+ * @param s State
  * @param search Search query
- * @param src    Stream source
- * @return Query function
  **/
 function query_streams(s, search) {
     switch (s.flags.source) {
@@ -235,8 +252,8 @@ function query_streams(s, search) {
 }
 /**
  * @description Query source and display results
+ * @param s State
  * @param search Unformatted query string
- * @param src    Streams source
  **/
 async function search_streams(s, search) {
     s.comp.loading.load('Searching: ' + search);
@@ -262,12 +279,14 @@ async function search_streams(s, search) {
 }
 /**
  * @description Refresh table with last query
+ * @param s State
  **/
 async function refresh_table(s) {
     return await search_streams(s, s.flags.last_search);
 }
 /**
  * @description Toggle the input textarea
+ * @param s State
  **/
 function toggle_input(s) {
     const tab = s.flags.is_input ? s.flags.source : 'Search';
@@ -291,6 +310,11 @@ function toggle_input(s) {
     set_header_title(s2);
     return s2;
 }
+/**
+ * @description Handle raw input lines
+ * @param s State
+ * @param line Input line
+ **/
 async function input_handler(s, line) {
     // Command
     if (line === ':q') {
@@ -305,7 +329,8 @@ async function input_handler(s, line) {
     }
 }
 /**
- * @description Set events
+ * @description Set blessed events
+ * @param s State
  **/
 function set_events(s) {
     // Screen events
@@ -358,13 +383,24 @@ function set_events(s) {
         set_events(s2);
     });
 }
+/**
+ * @description Initialize
+ * @param s State
+ */
 async function init(s) {
     set_events(s);
     s.scr.render();
     const s2 = await search_streams(s, s.flags.last_search);
     set_events(s2);
 }
+/**
+ * @description Initialize program state
+ * @param config Configuration file
+ * @param argv Command line arguments
+ */
 function init_state(config, argv) {
+    // Declare here in order to reduce startup time by 50ms or so
+    const Blessed = require('blessed');
     const scr = Blessed.screen({
         autoPadding: true,
         debug: false,

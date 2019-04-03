@@ -19,10 +19,6 @@
  * along with this program.  If not, see {@link https://www.gnu.org/licenses/}.
  *
  *
- * TESTING
- * @todo Go to the last index when pressing up in the first index
- * @todo Fix set_title inside set_header
- *
  * IN PROGRESS
  * @todo Catch errors
  * @todo Test file
@@ -32,11 +28,10 @@
  * @todo Remove layout-breaking characters
  *
  * TODO
- * @todo Reduce startup and quit overhead
- * @todo Check whether mplayer is installed
+ * @todo Add mplayer to deb dependencies
  * @todo Volume bar
+ * @todo Add option to add non-selectable descriptions
  **/
-import * as Blessed from 'blessed';
 import Minimist     from 'minimist';
 
 import * as Util    from './lib/util';
@@ -58,7 +53,16 @@ import { State, Config, Entry } from './lib/interfaces';
  * Add podcasts
  * Add free music sources
  **/
-function force_exit(s :any, smth :any) :void {
+
+/**
+ * TODO: Remove this function in favor of quit
+ * @description Destroy the interface and force exit the program
+ * @param s State
+ * @param smth Anything to print
+ **/
+async function force_exit(s :State, smth :any) :Promise<void> {
+  await Mplayer.quit();
+
   s.scr.destroy();
   console.log(smth);
 
@@ -66,7 +70,9 @@ function force_exit(s :any, smth :any) :void {
   process.exit();
 }
 
-// Usage
+/**
+ * @description Print usage and exit
+ **/
 function print_usage_and_exit() :void {
   console.log(`
 Usage: netstreams [ARGS]
@@ -82,8 +88,10 @@ Options:
 
 /**
  * @description Stop the player and exit
+ * @param s State
+ * @param line Exit line
  **/
-async function exit(s :State, line? :string) :Promise<void> {
+async function exit(s :State, line :string = '') :Promise<void> {
   await Mplayer.quit();
   
   // Exit interface
@@ -98,6 +106,7 @@ async function exit(s :State, line? :string) :Promise<void> {
 
 /**
  * @description Stop the player
+ * @param s State
  **/
 async function stop(s :State) :Promise<State> {
   await Mplayer.stop();
@@ -110,6 +119,11 @@ async function stop(s :State) :Promise<State> {
   return s2;
 }
 
+/**
+ * @description Set state flags
+ * @param s State
+ * @param flags Flags to set
+ **/
 function set_flags(s :State, flags :any) :State {
   const _flags = Object.assign( Object.assign({}, s.flags), flags);
 
@@ -122,6 +136,11 @@ function set_flags(s :State, flags :any) :State {
   };
 }
 
+/**
+ * @description Set state stream list
+ * @param s State
+ * @param list Stream list
+ **/
 function set_stream_list(s :State, list :Entry[]) :State {
   return {
     scr         : s.scr,
@@ -134,6 +153,7 @@ function set_stream_list(s :State, list :Entry[]) :State {
 
 /**
  * @description Pause/Resume the player
+ * @param s State
  **/
 async function pause(s :State) :Promise<State> {
   await Mplayer.pause();
@@ -147,7 +167,8 @@ async function pause(s :State) :Promise<State> {
 
 /**
  * @description Play a url with mplayer
- * @param entry Table entry
+ * @param s State
+ * @param entry Stream entry
  **/
 async function play_url(s :State, entry :Entry) :Promise<State> {
   try {
@@ -172,7 +193,7 @@ async function play_url(s :State, entry :Entry) :Promise<State> {
 
 /**
  * @description Set current tab in the header
- * @param tab Current tab
+ * @param s State
  **/
 function set_header(s :State) :void {
   const line = Util.format_header(
@@ -187,18 +208,16 @@ function set_header(s :State) :void {
 
 /**
  * @description Set window title
- * @param src  Current source
- * @param name Entry name
+ * @param s State
+ * @param stream_name Name of the stream
  **/
-function set_title(s :State, stream_name? :string) :void {
+function set_title(s :State, stream_name :string = '') :void {
   // Keep the old title if it's playing
   if(!s.flags.is_playing)
-    s.scr.title = stream_name === undefined
-      ? Util.format_title(s, '')
-      : Util.format_title(s, stream_name);
+    s.scr.title = Util.format_title(s, stream_name);
 }
 
-function set_header_title(s: State, stream_name? :string) :void {
+function set_header_title(s: State, stream_name :string = '') :void {
   set_header(s);
   set_title(s, stream_name);
 
@@ -207,7 +226,8 @@ function set_header_title(s: State, stream_name? :string) :void {
 
 /**
  * @description Display <rows> in stream_table
- * @param Array of formatted rows
+ * @param s State
+ * @param rows Array of formatted rows
  **/
 function set_rows(s :State, rows :string[][]) :void {
   s.comp.stream_table.setData(rows);
@@ -215,9 +235,8 @@ function set_rows(s :State, rows :string[][]) :void {
 
 /**
  * @description Get query function
+ * @param s State
  * @param search Search query
- * @param src    Stream source
- * @return Query function
  **/
 function query_streams(s :State, search :string) : Promise<Entry[]> {
   switch(s.flags.source) {
@@ -264,8 +283,8 @@ function query_streams(s :State, search :string) : Promise<Entry[]> {
 
 /**
  * @description Query source and display results
+ * @param s State
  * @param search Unformatted query string
- * @param src    Streams source
  **/
 async function search_streams(s :State, search :string) :Promise<State> {
   s.comp.loading.load('Searching: ' + search);
@@ -304,6 +323,7 @@ async function search_streams(s :State, search :string) :Promise<State> {
 
 /**
  * @description Refresh table with last query
+ * @param s State
  **/
 async function refresh_table(s :State) :Promise<State> {
   return await search_streams(s, s.flags.last_search);
@@ -311,6 +331,7 @@ async function refresh_table(s :State) :Promise<State> {
 
 /**
  * @description Toggle the input textarea
+ * @param s State
  **/
 function toggle_input(s :State) :State {
   const tab = s.flags.is_input ? s.flags.source : 'Search';
@@ -342,7 +363,11 @@ function toggle_input(s :State) :State {
 
   return s2;
 }
-
+/**
+ * @description Handle raw input lines
+ * @param s State
+ * @param line Input line
+ **/
 async function input_handler(s :State, line :string) :Promise<State> {
   // Command
   if(line === ':q') {
@@ -359,7 +384,8 @@ async function input_handler(s :State, line :string) :Promise<State> {
 }
 
 /**
- * @description Set events
+ * @description Set blessed events
+ * @param s State
  **/
 function set_events(s :State) :void {
   // Screen events
@@ -421,6 +447,10 @@ function set_events(s :State) :void {
   });
 }
 
+/**
+ * @description Initialize
+ * @param s State
+ */
 async function init(s :State) :Promise<void> {
   set_events(s);
   s.scr.render();
@@ -429,7 +459,15 @@ async function init(s :State) :Promise<void> {
   set_events(s2);
 }
 
+/**
+ * @description Initialize program state
+ * @param config Configuration file
+ * @param argv Command line arguments
+ */
 function init_state(config :Config, argv :any) :State {
+  // Declare here in order to reduce startup time by 50ms or so
+  const Blessed = require('blessed');
+
   const scr = Blessed.screen({
     autoPadding : true,
     debug       : false,

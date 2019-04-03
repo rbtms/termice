@@ -36,7 +36,6 @@ class Mplayer {
   /**
    * @method kill
    * @description Kill all mplayer processes
-   * @param f (Optional) Callback function
    **/
   // TODO: Dont kill all processes
   async kill() :Promise<void> {
@@ -56,12 +55,11 @@ class Mplayer {
    * @method mplayer_stdin
    * @description Write a string to mplayer process stdin pipe
    * @param line         String to be written
-   * @param f            (Optional) Callback function
-   * @param call_no_init Call the callback even if mplayer is not initiated
+   * @param call_no_init WHether to succeed even if the mplayer pipe is not initiated
    **/
-  mplayer_stdin(line :string, call_no_init? :boolean) :Promise<void> {
+  mplayer_stdin(line :string, call_no_init :boolean = false) :Promise<void> {
     return new Promise( (resolve, reject) => {
-      if(!this.is_init) {
+      if(this.is_init) {
         this.pipe.stdin.write(line + '\n');
         setTimeout(resolve, this.wait_io);
       }
@@ -74,6 +72,12 @@ class Mplayer {
     });
   }
 
+  /**
+   * @method init_player
+   * @description Initialize mplayer pipe
+   * @param url URL of the stream to play
+   * @param is_playlist Whether if the stream is a playlist or not
+   */
   init_mplayer(url :string, is_playlist :boolean) :void {
     if(this.is_init) {
       throw Error('Mplayer already initiated.');
@@ -93,7 +97,13 @@ class Mplayer {
     }
   }
 
-  async loadfile(url :string, is_playlist :boolean) :Promise<void> {
+  /**
+   * @method load_line
+   * @description Load a stream
+   * @param url URL of the stream to play
+   * @param is_playlist Whether if the stream is a playlist or not
+   */
+  async load_file(url :string, is_playlist :boolean) :Promise<void> {
     const cmd = is_playlist ? 'loadlist' : 'loadfile';
     return this.mplayer_stdin(`${cmd} ${url} 0`, true);
   }
@@ -103,14 +113,13 @@ class Mplayer {
    * @description Play a url with mplayer
    * @param url URL
    * @param is_playlist Whether to launch mplayer with the -playlist argument
-   * @param f (Optional) Callback function
    **/
   play(url :string, is_playlist :boolean) :Promise<void> {
     return new Promise( async (resolve, reject) => {
       if(this.is_init) {
-        //stop( () => loadfile(url, is_playlist, f) );
+        //stop( () => load_file(url, is_playlist, f) );
         try {
-          await this.loadfile(url, is_playlist);
+          await this.load_file(url, is_playlist);
           resolve();
         }
         catch(err) {
@@ -127,7 +136,6 @@ class Mplayer {
   /**
    * @method quit
    * @description Quit mplayer
-   * @param f (Optional) Callback function
    **/
   async quit() :Promise<void> {
     return this.mplayer_stdin('quit', true);
@@ -136,7 +144,6 @@ class Mplayer {
   /**
    * @method pause
    * @description Pause mplayer
-   * @param f (Optional) Callback function
    **/
   async pause() :Promise<void> {
     return this.mplayer_stdin('pause', false);
@@ -148,13 +155,12 @@ class Mplayer {
    * @param n Relative value to change volume by preceded by sign
    **/
   async volume(n :string) :Promise<void> {
-    return this.mplayer_stdin(`volume ${n} 0`);
+    return this.mplayer_stdin(`volume ${n} 0`, false);
   }
 
   /**
    * @method stop
    * @description Stop mplayer
-   * @param f (Optional) Callback function
    **/
   async stop() :Promise<void> {
     return this.mplayer_stdin('stop', true);

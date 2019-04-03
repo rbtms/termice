@@ -22,7 +22,7 @@ declare class Mplayer {
      **/
     mplayer_stdin(line: string, call_no_init?: boolean): Promise<void>;
     init_mplayer(url: string, is_playlist: boolean): void;
-    loadfile(url: string, is_playlist: boolean): Promise<void>;
+    load_file(url: string, is_playlist: boolean): Promise<void>;
     /**
      * @method play
      * @description Play a url with mplayer
