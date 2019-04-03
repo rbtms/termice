@@ -30,6 +30,8 @@
  * @todo Add mplayer to deb dependencies
  * @todo Volume bar
  * @todo Add option to add non-selectable descriptions
+ * @todo Improve performance on large lists
+ * @todo Add some help of querying options
  *
  * IDEAS
  * @todo Update currently playing track information
@@ -44,7 +46,6 @@ import * as Radio   from './lib/radio';
 import Mplayer      from './lib/mplayer';
 
 import { State, Config, Entry } from './lib/interfaces';
-
 
 /**
  * TODO: Remove this function in favor of quit

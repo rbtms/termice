@@ -9,8 +9,8 @@ import {
   StringJSON,
   AnyJSON } from './interfaces';
 
-export const CONFIG_PATH = './src/js/conf/config.json';
-export const STYLES_PATH = './src/js/conf/styles.json';
+export const CONFIG_PATH = './src/conf/config.json';
+export const STYLES_PATH = './src/conf/styles.json';
 
 /**
  * @description Read configuration file

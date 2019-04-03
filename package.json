@@ -8,7 +8,7 @@
     "start": "NODE_PATH=./src/js node src/js/main.js",
     "test": "mocha test/test.js || true",
     "build": "tsc || true",
-    "pkg": "pkg src/js/main.js -t node10-linux-x64 -o bin/main && cp src/ts/config.json bin",
+    "pkg": "pkg src/js/main.js -t node10-linux-x64 -o bin/main && cp src/conf bin -r",
     "doc": "jsdoc -r -c jsdoc.json -d doc || true"
   },
   "license": "GPL-3.0",
@@ -24,6 +24,7 @@
     "@types/jsdom": "^12.2.3",
     "@types/jsonfile": "^4.0.1",
     "@types/minimist": "^1.2.0",
-    "@types/request": "^2.47.0"
+    "@types/request": "^2.47.0",
+    "mocha": "^6.0.2"
   }
 }
