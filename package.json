@@ -1,9 +1,9 @@
 {
   "name": "netstreams",
-  "author": "",
+  "author": "Alvaro Fernandez nishinishi9999@protonmail.com",
   "version": "0.1.0",
   "description": "Simple terminal net stream player",
-  "main": "js/main.js",
+  "main": "src/js/main.js",
   "scripts": {
     "start": "NODE_PATH=./src/js node src/js/main.js",
     "test": "mocha test/test.js || true",
