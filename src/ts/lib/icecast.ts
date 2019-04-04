@@ -12,7 +12,7 @@ import { error_entry } from './util';
  * @return Stream list promise
  **/
 export function search_xiph(search :string) :Promise<Entry[]> {
-  return new Promise( (resolve) => {
+  return new Promise( resolve => {
     const options = {
       method : 'GET',
       url    : 'http://dir.xiph.org/search?search=' + search.split(' ').join('+')
@@ -124,8 +124,6 @@ function parse_xiph(body :string) :Entry[] {
       };
     });
 }
-
-search_shoutcast('anime').then();
 
 function parse_shoutcast(json :AnyJSON) :Entry[] {
   return Object.keys(json).map( key => ({

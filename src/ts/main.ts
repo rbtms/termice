@@ -4,7 +4,7 @@
  * @version      0.1.0
  * @description  Simple terminal net stream player
  * @license
- * Copyright (c) 2018 Alvaro Fernandez
+ * Copyright (c) 2019 Alvaro Fernandez
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,14 +19,12 @@
  * along with this program.  If not, see {@link https://www.gnu.org/licenses/}.
  *
  *
- * IN PROGRESS
- * @todo Log errors
- * @todo Test file
- *
  * ERROR
  * @todo Remove layout-breaking characters
  *
  * TODO
+ * @todo Log errors
+ * @todo Test file
  * @todo Add mplayer to deb dependencies
  * @todo Volume bar
  * @todo Add option to add non-selectable descriptions
@@ -70,10 +68,21 @@ function print_usage_and_exit() :void {
   console.log(`
 Usage: netstreams [ARGS]
 
-Options:
+Options
   -h: Show this help
   -q: Query
   -s: Source [Icecast | Shoutcast | Radio]
+
+Commands [:command | query]
+   q : Quit
+
+Sources
+   Icecast   : https://dir.xiph.org
+   Shoutcast : https://directory.shoutcast.com
+   Radio     : http://www.radio-browser.info
+     This source also allows to filter results
+     by name, tag, country or language, which can
+     be achieved by querying for filter:query
 `);
 
   process.exit();
@@ -104,10 +113,9 @@ async function exit(s :State, line = '') :Promise<void> {
 async function stop(s :State) :Promise<State> {
   await Mplayer.stop();
 
-  const s2 = set_flags(s, { is_playing: !s.flags.is_playing});
+  const s2 = set_flags(s, { is_playing: !s.flags.is_playing });
 
-  // Update title
-  set_title(s2);
+  set_header_title(s2);
 
   return s2;
 }
@@ -120,13 +128,13 @@ async function stop(s :State) :Promise<State> {
 function set_flags(s :State, flags :any) :State {
   const _flags = Object.assign( Object.assign({}, s.flags), flags);
 
-  return {
+  return Object.freeze({
     scr         : s.scr,
     comp        : s.comp,
     config      : s.config,
     stream_list : s.stream_list.slice(),
-    flags       : _flags
-  };
+    flags       : Object.freeze(_flags)
+  });
 }
 
 /**
@@ -135,13 +143,13 @@ function set_flags(s :State, flags :any) :State {
  * @param list Stream list
  **/
 function set_stream_list(s :State, list :Entry[]) :State {
-  return {
+  return Object.freeze({
     scr         : s.scr,
     comp        : s.comp,
     config      : s.config,
     stream_list : list.slice(),
     flags       : s.flags
-  };
+  });
 }
 
 /**
@@ -377,46 +385,53 @@ function set_events(s :State) :void {
    * Delete previous select event as there doesnt
    * seem to be any elegant way to do it
    */
-  s.scr.unkey( [ s.config.keys.screen.quit     ]);
-  s.scr.unkey( [ s.config.keys.screen.pause    ]);
-  s.scr.unkey( [ s.config.keys.screen.stop     ]);
-  s.scr.unkey( [ s.config.keys.screen.vol_up   ]);
-  s.scr.unkey( [ s.config.keys.screen.vol_down ]);
-  s.scr.unkey( [ s.config.keys.screen.input    ]);
+  s.scr.unkey( s.config.keys.screen.quit     );
+  s.scr.unkey( s.config.keys.screen.pause    );
+  s.scr.unkey( s.config.keys.screen.stop     );
+  s.scr.unkey( s.config.keys.screen.vol_up   );
+  s.scr.unkey( s.config.keys.screen.vol_down );
+  s.scr.unkey( s.config.keys.screen.input    );
 
-  s.scr.unkey( s.config.keys.screen.icecast ); 
+  s.scr.unkey( s.config.keys.screen.icecast   ); 
   s.scr.unkey( s.config.keys.screen.shoutcast );
-  s.scr.unkey( s.config.keys.screen.radio );
-  s.scr.unkey( s.config.keys.screen.refresh );
+  s.scr.unkey( s.config.keys.screen.radio     );
+  s.scr.unkey( s.config.keys.screen.refresh   );
 
-  s.comp.stream_table.unkey( [ s.config.keys.screen.input ] );
-  s.comp.stream_table.unkey( [s.config.keys.stream_table.debug ] );
+  s.comp.stream_table.unkey( s.config.keys.screen.input       );
+  s.comp.stream_table.unkey( s.config.keys.stream_table.debug );
 
-  s.comp.input.unkey( [ s.config.keys.screen.input ] );
+  s.comp.input.unkey( s.config.keys.screen.input );
   s.comp.input.unkey('enter');
 
   delete s.comp.stream_table._events.select;
 
   // -----------------------------------------------------
 
-  // Screen events
-  s.scr.onceKey( [ s.config.keys.screen.quit ], () =>
+  /*
+   * Screen events
+   */
+
+  s.scr.onceKey(s.config.keys.screen.quit, () =>
     exit(s)
   );
-  s.scr.onceKey( [ s.config.keys.screen.pause ], async () => {
+  s.scr.onceKey(s.config.keys.screen.pause, async () => {
     const s2 = await pause(s);
     set_events(s2);
   });
-  s.scr.onceKey( [ s.config.keys.screen.stop ], async () => {
+  s.scr.onceKey(s.config.keys.screen.stop, async () => {
     const s2 = await stop(s);
     set_events(s2);
   });
-  s.scr.onceKey( [ s.config.keys.screen.vol_up ], () =>
+  s.scr.key( s.config.keys.screen.vol_up, () =>
     Mplayer.volume('+1')
   );
-  s.scr.onceKey( [ s.config.keys.screen.vol_down ], () =>
+  s.scr.key( s.config.keys.screen.vol_down, () =>
     Mplayer.volume('-1')
   );
+
+  /*
+   * Stream table events
+   */
 
   // Icecast tab
   s.scr.onceKey( s.config.keys.screen.icecast, async () => {
@@ -442,7 +457,6 @@ function set_events(s :State) :void {
     set_events(s2);
   });
 
-  // Stream table events
   // Enter
   s.comp.stream_table.on('select', async (_ :any, i :number) => {
     const entry :Entry = s.stream_list[i-1];
@@ -451,18 +465,33 @@ function set_events(s :State) :void {
   });
 
   // Input toggle
-  s.comp.stream_table.onceKey([ s.config.keys.screen.input ], async () => {
+  s.comp.stream_table.onceKey(s.config.keys.screen.input, async () => {
     const s2 = show_input(s);
     set_events(s2);
   });
 
-  s.comp.stream_table.key([s.config.keys.stream_table.debug ], () => {
+  // Print entry to debug
+  s.comp.stream_table.key(s.config.keys.stream_table.debug, () => {
     const offset = s.comp.stream_table.childOffset;
     s.scr.debug( s.stream_list[offset-1].entry );
     //s.scr.debug(s.comp.stream_table.childOffset);
   });
 
-  // Input form events
+  // Skip 10 entries down
+  s.comp.stream_table.key(s.config.keys.stream_table.scroll_down, () => {
+    s.comp.stream_table.down(9);
+    s.scr.render();
+  });
+  // Skip 10 entries up
+  s.comp.stream_table.key(s.config.keys.stream_table.scroll_up, () => {
+    s.comp.stream_table.up(9);
+    s.scr.render();
+  });
+
+  /*
+   * Input form events
+   */
+
   // Query submit
   s.comp.input.onceKey('enter', async () => {
     const line :string = s.comp.input.getText().trim();
@@ -482,8 +511,6 @@ function set_events(s :State) :void {
  * @param s State
  */
 async function init(s :State) :Promise<void> {
-  set_events(s);
-
   // TODO: Have a look at this render (100ms startup time)
   set_header_title(s);
 
@@ -527,21 +554,20 @@ function init_state(config :Config, argv :any, styles :any) :State {
 
   comp.stream_table.focus();
 
-  return {
+  return Object.freeze({
     scr,
     comp,
     config,
     stream_list : [],
-    flags: {
+    flags: Object.freeze({
       last_search   : argv.q || config.default_search,
       last_tab      : argv.s || config.default_source,
       source        : argv.s || config.default_source,
       current_index : 0,
       is_playing    : false,
-      is_paused     : false,
-      is_input      : false
-    }
-  };
+      is_paused     : false
+    })
+  });
 }
 
 /**

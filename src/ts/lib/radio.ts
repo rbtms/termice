@@ -57,4 +57,3 @@ function parse_radio(json :AnyJSON) :Entry[] {
   }));
 }
 
-search_radio('anime', 'tag').then();

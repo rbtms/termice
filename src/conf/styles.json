@@ -1,14 +1,14 @@
  {
   "header": {
     "top"     : 0,
-    "left"    : 1,
-    "width"   : "99%",
+    "left"    : 0,
+    "width"   : "100%",
     "height"  : "8%",
     "content" : "",
     "tags"    : true,
 
     "padding": {
-      "left": 2
+      "left": 1
     },
 
     "border": {
@@ -29,15 +29,16 @@
   },
 
   "stream_table": {
-    "top"     : 3,
-    "left"    : 1,
-    "width"   : "99%",
-    "height"  : "90%",
+    "top"     : 2,
+    "left"    : 0,
+    "width"   : "100%",
+    "height"  : "99%",
     "content" : "  Loading...",
     "align"   : "left",
     "keys"    : ["up", "down"],
     "tags"    : true,
     "noCellBorders": true,
+    "mouse": true,
 
     "border": {
       "type": "bg"
@@ -66,8 +67,8 @@
 
   "input": {
     "bottom"  : 0,
-    "left"    : 1,
-    "width"   : "99%",
+    "left"    : 0,
+    "width"   : "100%",
     "height"  : 3,
     "content" : "Input",
     "tags"    : true,
@@ -91,8 +92,8 @@
 
   "loading": {
     "bottom"  : 0,
-    "left"    : 1,
-    "width"   : "99%",
+    "left"    : 0,
+    "width"   : "100%",
     "height"  : 3,
     "content" : "Input",
     "tags"    : true,
@@ -102,7 +103,6 @@
     },
 
     "hidden": true,
-
     "inputOnFocus": true,
 
     "border": {

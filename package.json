@@ -5,9 +5,9 @@
   "description": "Simple terminal net stream player",
   "main": "src/js/main.js",
   "scripts": {
-    "start": "NODE_PATH=./src/js node src/js/main.js",
+    "start": "node src/js/main.js",
     "test": "mocha test/test.js || true",
-    "build": "tsc || true",
+    "build": "tsc",
     "pkg": "pkg src/js/main.js -t node10-linux-x64 -o bin/main && cp src/conf bin -r",
     "doc": "jsdoc -r -c jsdoc.json -d doc || true"
   },

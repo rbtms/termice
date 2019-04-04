@@ -17,7 +17,6 @@ export interface Flags {
   current_index :number;
   is_playing    :boolean;
   is_paused     :boolean;
-  is_input      :boolean;
 }
 
 export interface Entry {
