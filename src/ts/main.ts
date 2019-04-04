@@ -1,5 +1,5 @@
 /**
- * @fileOverview main.js
+ * @fileOverview main.ts
  * @author       Alvaro Fernandez {@link https://github.com/nishinishi9999}
  * @version      0.1.0
  * @description  Simple terminal net stream player
@@ -390,6 +390,7 @@ function set_events(s :State) :void {
   s.scr.unkey( s.config.keys.screen.refresh );
 
   s.comp.stream_table.unkey( [ s.config.keys.screen.input ] );
+  s.comp.stream_table.unkey( [s.config.keys.stream_table.debug ] );
 
   s.comp.input.unkey( [ s.config.keys.screen.input ] );
   s.comp.input.unkey('enter');
@@ -442,24 +443,34 @@ function set_events(s :State) :void {
   });
 
   // Stream table events
+  // Enter
   s.comp.stream_table.on('select', async (_ :any, i :number) => {
     const entry :Entry = s.stream_list[i-1];
     const s2 = await play_url(s, entry);
     set_events(s2);
   });
 
-  s.comp.stream_table.onceKey( [ s.config.keys.screen.input ], async () => {
+  // Input toggle
+  s.comp.stream_table.onceKey([ s.config.keys.screen.input ], async () => {
     const s2 = show_input(s);
     set_events(s2);
   });
 
+  s.comp.stream_table.key([s.config.keys.stream_table.debug ], () => {
+    const offset = s.comp.stream_table.childOffset;
+    s.scr.debug( s.stream_list[offset-1].entry );
+    //s.scr.debug(s.comp.stream_table.childOffset);
+  });
+
   // Input form events
+  // Query submit
   s.comp.input.onceKey('enter', async () => {
     const line :string = s.comp.input.getText().trim();
     const s2 = await input_handler(s, line);
     set_events(s2);
   });
 
+  // Input toggle
   s.comp.input.onceKey( [ s.config.keys.screen.input ], async () => {
     const s2 = hide_input(s);
     set_events(s2);
@@ -491,7 +502,7 @@ function init_state(config :Config, argv :any, styles :any) :State {
 
   const scr = Blessed.screen({
     autoPadding : true,
-    debug       : false,
+    debug       : true,
     fullUnicode : true,
     //forceUnicode: true,
     smartCSR    : true,

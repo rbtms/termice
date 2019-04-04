@@ -17,8 +17,8 @@ export const STYLES_PATH = './src/conf/styles.json';
  **/
 export function read_json(path :string) :AnyJSON {
   try {
-    const json = JSON.parse( require('fs').readFileSync(path) );
-    return Object.freeze(json);
+    const json = require('jsonfile').readFileSync(path);
+    return json;
   }
   catch(err) {
     throw Error(`Couldn't load ${path}: ${err})`);
@@ -106,6 +106,27 @@ export function add_rows_padding(rows_header :string[], rows :string[][]) :strin
   );
 }
 
+export function error_entry(error :string) :Entry {
+  return {
+    name        : error,
+    homepage    : '',
+    listeners   : '',
+    description : '',
+    playing     : '',
+    url         : '',
+    bitrate     : '',
+    src         : '',
+    is_playlist : false,
+    entry       : ''
+  };
+}
+
+function format_bitrate(bitrate :string) :string {
+  const bitrate_pad = '   ';
+  const pad     = bitrate_pad.substr(bitrate.length);
+  return !bitrate || bitrate === '0' ? '' : `${pad}${bitrate} kbps`;
+}
+
 /**
  * @description Format icecast entries into stream_table rows
  * @param rows_header Header
@@ -117,21 +138,35 @@ function format_icecast_list(rows_header :string[], list :Entry[]) :string[][] {
     name: 30,
     playing: 50,
     description: 50,
-    listeners: 20
+    listeners: 20,
+    bitrate: 20
   };
 
-  return add_rows_padding(rows_header, list.map( (entry) => {
-    const playing     = entry.playing     || '';
-    const listeners   = entry.listeners   || 'Null';
-    //const description = entry.description || 'Null';
+  return add_rows_padding(rows_header, list.map( entry => [
+    entry.name.substr       (0, char_limit.name),
+    entry.playing.substr    (0, char_limit.playing),
+    //description.substr(0, char_limit.description),
+    entry.listeners.substr  (0, char_limit.listeners),
+    format_bitrate(entry.bitrate).substr(0, char_limit.bitrate)
+  ]));
+}
 
-    return [
-      entry.name.substr (0, char_limit.name),
-      playing.substr    (0, char_limit.playing),
-      //description.substr(0, char_limit.description),
-      listeners.substr  (0, char_limit.listeners)
-    ];
-  }));
+function format_shoutcast_list(rows_header :string[], list :Entry[]) :string[][] {
+  const char_limit = {
+    name: 30,
+    playing: 50,
+    description: 50,
+    listeners: 20,
+    bitrate: 20
+  };
+
+  return add_rows_padding(rows_header, list.map( entry => [
+    entry.name.substr       (0, char_limit.name),
+    entry.playing.substr    (0, char_limit.playing),
+    //description.substr(0, char_limit.description),
+    entry.listeners.substr  (0, char_limit.listeners),
+    format_bitrate(entry.bitrate).substr(0, char_limit.bitrate)
+  ]));
 }
 
 /**
@@ -141,20 +176,15 @@ function format_icecast_list(rows_header :string[], list :Entry[]) :string[][] {
  * @return Formatted table rows
  **/
 function format_radio_list(rows_header :string[], list :Entry[]) :string[][] {
-  const bitrate_pad = '   ';
   const char_limit  = {
-    name: 50
+    name: 50,
+    bitrate: 20
   };
 
-  return add_rows_padding(rows_header, list.map( (entry) => {
-    const bitrate = entry.bitrate || 'Null';
-    const pad     = bitrate_pad.substr(bitrate.length);
-
-    return [
-      entry.name.substr(0, char_limit.name),
-      `${pad}${bitrate} kbps`
-    ];
-  }));
+  return add_rows_padding(rows_header, list.map( entry => [
+    entry.name.substr(0, char_limit.name),
+    format_bitrate(entry.bitrate).substr(0, char_limit.bitrate)
+  ]));
 }
 
 /**
@@ -176,8 +206,9 @@ export function format_stream_list(
 
       switch(src) {
         case 'Icecast':
-        case 'Shoutcast':
           return format_icecast_list(rows_header, list);
+        case 'Shoutcast':
+          return format_shoutcast_list(rows_header, list);
         case 'Radio':
           return format_radio_list(rows_header, list);
         default:

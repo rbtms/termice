@@ -30,13 +30,14 @@
         },
         "stream_table": {
             "up": "up",
-            "down": "down"
+            "down": "down",
+            "debug": "d"
         }
     },
     
     "table_headers": {
-        "Icecast" : ["Name", "Playing", "Listeners"],
-        "Shoutcast" : ["Name", "Playing", "Listeners"],
+        "Icecast" : ["Name", "Playing", "Listeners", "Bitrate"],
+        "Shoutcast" : ["Name", "Playing", "Listeners", "Bitrate"],
         "Radio": ["Name", "Bitrate"]
     },
     
