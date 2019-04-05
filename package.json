@@ -9,7 +9,7 @@
     "test": "mocha test/test.js || true",
     "build": "tsc",
     "pkg": "pkg src/js/main.js -t node10-linux-x64 -o bin/main && cp src/conf bin -r",
-    "doc": "jsdoc -r -c jsdoc.json -d doc || true"
+    "doc": "tsdoc"
   },
   "license": "GPL-3.0",
   "dependencies": {

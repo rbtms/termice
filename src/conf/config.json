@@ -3,6 +3,8 @@
   "default_source": "Radio",
 
   "pause_key": "Sp",
+  "scroll_up_dist": 9,
+  "scroll_down_dist": 9,
 
   "header": {
     "Q": "Exit",
@@ -31,9 +33,13 @@
     "stream_table": {
       "up": "up",
       "down": "down",
+      "enter": "enter",
       "scroll_up": "left",
       "scroll_down": "right",
       "debug": "d"
+    },
+    "input": {
+      "submit": "enter"
     }
   },
 

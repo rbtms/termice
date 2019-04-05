@@ -21,6 +21,7 @@
  *
  * ERROR
  * @todo Remove layout-breaking characters
+ * @todo Scroll up near the first entry makes cursor to disappear
  *
  * TODO
  * @todo Log errors
@@ -29,7 +30,7 @@
  * @todo Volume bar
  * @todo Add option to add non-selectable descriptions
  * @todo Improve performance on large lists
- * @todo Add some help of querying options
+ * @todo Fix pause
  *
  * IDEAS
  * @todo Update currently playing track information
@@ -47,11 +48,11 @@ import { State, Config, Entry } from './lib/interfaces';
 
 /**
  * TODO: Remove this function in favor of quit
- * @description Destroy the interface and force exit the program
+ * @description Destroy the interface and force exit the program (debug)
  * @param s State
  * @param smth Anything to print
  **/
-async function force_exit(s :State, smth :any) :Promise<void> {
+async function force_quit(s :State, smth :any) :Promise<void> {
   await Mplayer.quit();
 
   s.scr.destroy();
@@ -64,7 +65,7 @@ async function force_exit(s :State, smth :any) :Promise<void> {
 /**
  * @description Print usage and exit
  **/
-function print_usage_and_exit() :void {
+function print_usage_and_quit() :void {
   console.log(`
 Usage: netstreams [ARGS]
 
@@ -93,7 +94,7 @@ Sources
  * @param s State
  * @param line Exit line
  **/
-async function exit(s :State, line = '') :Promise<void> {
+async function quit(s :State, line = '') :Promise<void> {
   await Mplayer.quit();
   
   // Exit interface
@@ -104,20 +105,6 @@ async function exit(s :State, line = '') :Promise<void> {
     throw Error(line);
 
   process.exit();
-}
-
-/**
- * @description Stop the player
- * @param s State
- **/
-async function stop(s :State) :Promise<State> {
-  await Mplayer.stop();
-
-  const s2 = set_flags(s, { is_playing: !s.flags.is_playing });
-
-  set_header_title(s2);
-
-  return s2;
 }
 
 /**
@@ -132,7 +119,7 @@ function set_flags(s :State, flags :any) :State {
     scr         : s.scr,
     comp        : s.comp,
     config      : s.config,
-    stream_list : s.stream_list.slice(),
+    stream_list : s.stream_list,
     flags       : Object.freeze(_flags)
   });
 }
@@ -153,17 +140,38 @@ function set_stream_list(s :State, list :Entry[]) :State {
 }
 
 /**
+ * @description Stop the player
+ * @param s State
+ **/
+async function stop(s :State) :Promise<State> {
+  const s2 = set_flags(s, {
+    is_playing: !s.flags.is_playing,
+    is_paused: false
+  });
+
+  await Mplayer.stop();
+  set_header_title(s2);
+
+  return s2;
+}
+
+/**
  * @description Pause/Resume the player
  * @param s State
  **/
 async function pause(s :State) :Promise<State> {
-  await Mplayer.pause();
-
-  // Update pause key text
-  // Renders screen
-  set_header_title(s);
-
-  return set_flags(s, { is_paused: !s.flags.is_paused });
+  if( Mplayer.is_init ) {
+    await Mplayer.pause();
+  
+    // Update pause key text
+    // Renders screen
+    set_header_title(s);
+  
+    return set_flags(s, { is_paused: !s.flags.is_paused });
+  }
+  else {
+    return s;
+  }
 }
 
 /**
@@ -186,7 +194,7 @@ async function play_url(s :State, entry :Entry) :Promise<State> {
     return set_flags(s2, { is_playing: true });
   }
   catch(err) {
-    force_exit(s, err);
+    force_quit(s, err);
     // TODO: Mock return
     return s;
   }
@@ -227,7 +235,7 @@ function set_header_title(s: State, stream_name = '') :void {
   set_header(s);
   set_title(s, stream_name);
 
-  s.scr.render();
+  render(s);
 }
 
 /**
@@ -280,7 +288,7 @@ function query_streams(s :State, search :string) : Promise<Entry[]> {
       }
     }
     default: {
-      force_exit(s, 'Not a valid source: ' + s.flags.source);
+      force_quit(s, 'Not a valid source: ' + s.flags.source);
       return query_streams(s, s.flags.last_search);
     }
   }
@@ -364,7 +372,7 @@ function hide_input(s :State) :State {
 async function input_handler(s :State, line :string) :Promise<State> {
   // Command
   if(line === ':q') {
-    await exit(s);
+    await quit(s);
     return s;
   }
   // Query
@@ -377,14 +385,17 @@ async function input_handler(s :State, line :string) :Promise<State> {
 }
 
 /**
- * @description Set blessed events
+ * @description Render screen
+ */
+function render(s :State) :void {
+  s.scr.render();
+}
+
+/**
+ * @description Remove events in order to set them to the next state
  * @param s State
- **/
-function set_events(s :State) :void {
-  /*
-   * Delete previous select event as there doesnt
-   * seem to be any elegant way to do it
-   */
+ */
+function remove_events(s: State) :void {
   s.scr.unkey( s.config.keys.screen.quit     );
   s.scr.unkey( s.config.keys.screen.pause    );
   s.scr.unkey( s.config.keys.screen.stop     );
@@ -397,29 +408,45 @@ function set_events(s :State) :void {
   s.scr.unkey( s.config.keys.screen.radio     );
   s.scr.unkey( s.config.keys.screen.refresh   );
 
-  s.comp.stream_table.unkey( s.config.keys.screen.input       );
-  s.comp.stream_table.unkey( s.config.keys.stream_table.debug );
+  s.comp.stream_table.unkey( s.config.keys.screen.input             );
+  s.comp.stream_table.unkey( s.config.keys.stream_table.debug       );
+  s.comp.stream_table.unkey( s.config.keys.stream_table.scroll_down );
+  s.comp.stream_table.unkey( s.config.keys.stream_table.scroll_up   );
 
   s.comp.input.unkey( s.config.keys.screen.input );
-  s.comp.input.unkey('enter');
+  s.comp.input.unkey( s.config.keys.input.submit );
 
   delete s.comp.stream_table._events.select;
+}
 
-  // -----------------------------------------------------
+/**
+ * @description Set blessed events
+ * @param s State
+ **/
+function set_events(s :State) :void {
+  remove_events(s);
 
   /*
    * Screen events
    */
 
   s.scr.onceKey(s.config.keys.screen.quit, () =>
-    exit(s)
+    quit(s)
   );
+
+  // Mplayer
   s.scr.onceKey(s.config.keys.screen.pause, async () => {
+    s.comp.loading.load('Pausing');
     const s2 = await pause(s);
+    s.comp.loading.stop();
+
     set_events(s2);
   });
   s.scr.onceKey(s.config.keys.screen.stop, async () => {
+    s.comp.loading.load('Stopping');
     const s2 = await stop(s);
+    s.comp.loading.stop();
+
     set_events(s2);
   });
   s.scr.key( s.config.keys.screen.vol_up, () =>
@@ -474,18 +501,17 @@ function set_events(s :State) :void {
   s.comp.stream_table.key(s.config.keys.stream_table.debug, () => {
     const offset = s.comp.stream_table.childOffset;
     s.scr.debug( s.stream_list[offset-1].entry );
-    //s.scr.debug(s.comp.stream_table.childOffset);
   });
 
   // Skip 10 entries down
   s.comp.stream_table.key(s.config.keys.stream_table.scroll_down, () => {
-    s.comp.stream_table.down(9);
-    s.scr.render();
+    s.comp.stream_table.down(s.config.scroll_up_dist);
+    render(s);
   });
   // Skip 10 entries up
   s.comp.stream_table.key(s.config.keys.stream_table.scroll_up, () => {
-    s.comp.stream_table.up(9);
-    s.scr.render();
+    s.comp.stream_table.up(s.config.scroll_down_dist);
+    render(s);
   });
 
   /*
@@ -493,17 +519,19 @@ function set_events(s :State) :void {
    */
 
   // Query submit
-  s.comp.input.onceKey('enter', async () => {
+  s.comp.input.onceKey(s.config.keys.input.submit, async () => {
     const line :string = s.comp.input.getText().trim();
     const s2 = await input_handler(s, line);
     set_events(s2);
   });
 
   // Input toggle
-  s.comp.input.onceKey( [ s.config.keys.screen.input ], async () => {
+  s.comp.input.onceKey(s.config.keys.screen.input, async () => {
     const s2 = hide_input(s);
     set_events(s2);
   });
+
+  s.comp.loading.onceKey('q', () => quit(s));
 }
 
 /**
@@ -581,7 +609,7 @@ function main() :void {
     argv.h
     || !!Object.keys(argv).find( (opt :string) => !available_opts.includes(opt) )
   )
-    print_usage_and_exit();
+    print_usage_and_quit();
   else {
     const config = Util.read_config();
     const styles = Util.read_styles();

@@ -142,7 +142,7 @@ class Mplayer {
    * @description Pause mplayer
    **/
   async pause() :Promise<void> {
-    return this.mplayer_stdin('pause', false);
+    return this.mplayer_stdin('pause', true);
   }
 
   /**
