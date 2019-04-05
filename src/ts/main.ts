@@ -30,7 +30,6 @@
  * @todo Volume bar
  * @todo Add option to add non-selectable descriptions
  * @todo Improve performance on large lists
- * @todo Fix pause
  *
  * IDEAS
  * @todo Update currently playing track information
@@ -146,12 +145,11 @@ function set_stream_list(s :State, list :Entry[]) :State {
  **/
 async function stop(s :State) :Promise<State> {
   const s2 = set_flags(s, {
-    is_playing: !s.flags.is_playing,
-    is_paused: false
+    is_paused  : false
   });
 
   await Mplayer.stop();
-  set_header_title(s2);
+  set_header(s2);
 
   return s2;
 }
@@ -162,12 +160,12 @@ async function stop(s :State) :Promise<State> {
  **/
 async function pause(s :State) :Promise<State> {
   if( Mplayer.is_init ) {
+    const s2 = set_flags(s, { is_paused: !s.flags.is_paused });
+
     await Mplayer.pause();
   
     // Update pause key text
-    // Renders screen
-    const s2 = set_flags(s, { is_paused: !s.flags.is_paused });
-    set_header_title(s2);
+    set_header(s2);
   
     return s2;
   }
@@ -183,17 +181,14 @@ async function pause(s :State) :Promise<State> {
  **/
 async function play_url(s :State, entry :Entry) :Promise<State> {
   try {
+    const s2 = set_flags(s, { is_paused : false });
+
     await Mplayer.play(entry.url, entry.is_playlist);
 
-    const s2 = set_flags(s, {
-      is_playing : false,
-      is_paused  : false
-    });
+    set_header(s2);
+    render(s2);
 
-    // Renders screen
-    set_header_title(s2, entry.name);
-
-    return set_flags(s2, { is_playing: true });
+    return s2;
   }
   catch(err) {
     force_quit(s, err);
@@ -215,29 +210,6 @@ function set_header(s :State) :void {
   );
 
   s.comp.header.setContent(line);
-}
-
-/**
- * @description Set window title
- * @param s State
- * @param stream_name Name of the stream
- **/
-function set_title(s :State, stream_name = '') :void {
-  // Keep the old title if it's playing
-  if(!s.flags.is_playing)
-    s.scr.title = Util.format_title(s, stream_name);
-}
-
-/**
- * @description Set header tab and window title
- * @param s State
- * @param stream_name Name of the stream
- */
-function set_header_title(s: State, stream_name = '') :void {
-  set_header(s);
-  set_title(s, stream_name);
-
-  render(s);
 }
 
 /**
@@ -307,8 +279,7 @@ async function search_streams(s :State, search :string) :Promise<State> {
   // Update flags
   const s2 = set_flags(s, {
     last_search   : search,
-    last_tab      : s.flags.source,
-    current_index : 0
+    last_tab      : s.flags.source
   });
 
   const list :Entry[] = await query_streams(s2, search);
@@ -324,13 +295,13 @@ async function search_streams(s :State, search :string) :Promise<State> {
     search
   );
 
-  //// Show an error message on false
+  // TODO: Show an error message on error
   if(rows !== false) {
     set_rows(s3, rows);
     s3.comp.loading.stop();
 
-    // Renders screen
-    set_header_title(s3);
+    set_header(s3);
+    render(s3);
   }
 
   return s3;
@@ -351,7 +322,7 @@ function show_input(s :State) :State {
   //s2.comp.input.input();
   s2.comp.input.focus();
 
-  set_header_title(s2);
+  set_header(s2);
 
   return s2;
 }
@@ -361,7 +332,8 @@ function hide_input(s :State) :State {
 
   s2.comp.input.hide();
   s2.comp.stream_table.focus();
-  set_header_title(s2);
+  set_header(s2);
+  render(s2);
 
   return s2;
 }
@@ -447,6 +419,7 @@ function set_events(s :State) :void {
     const s2 = await pause(s);
     s.comp.loading.stop();
 
+    render(s);
     set_events(s2);
   });
   s.scr.onceKey(s.config.keys.screen.stop, async () => {
@@ -454,6 +427,7 @@ function set_events(s :State) :void {
     const s2 = await stop(s);
     s.comp.loading.stop();
 
+    render(s2);
     set_events(s2);
   });
   s.scr.key( s.config.keys.screen.vol_up, () =>
@@ -501,6 +475,7 @@ function set_events(s :State) :void {
   // Input toggle
   s.comp.stream_table.onceKey(s.config.keys.screen.input, async () => {
     const s2 = show_input(s);
+    render(s2);
     set_events(s2);
   });
 
@@ -547,7 +522,8 @@ function set_events(s :State) :void {
  */
 async function init(s :State) :Promise<void> {
   // TODO: Have a look at this render (100ms startup time)
-  set_header_title(s);
+  set_header(s);
+  render(s);
 
   const s2 = await search_streams(s, s.flags.last_search);
   set_events(s2);
@@ -598,8 +574,6 @@ function init_state(config :Config, argv :any, styles :any) :State {
       last_search   : argv.q || config.default_search,
       last_tab      : argv.s || config.default_source,
       source        : argv.s || config.default_source,
-      current_index : 0,
-      is_playing    : false,
       is_paused     : false
     })
   });

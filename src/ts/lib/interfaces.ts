@@ -14,8 +14,6 @@ export interface Flags {
   last_search   :string;
   last_tab      :string;
   source        :string;
-  current_index :number;
-  is_playing    :boolean;
   is_paused     :boolean;
 }
 
