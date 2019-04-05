@@ -9,8 +9,11 @@ import {
   StringJSON,
   AnyJSON } from './interfaces';
 
+// Test
 //export const CONFIG_PATH = '/etc/netstreams/config.json';
 //export const STYLES_PATH = '/etc/netstreams/styles.json';
+
+// Production
 export const CONFIG_PATH = './src/conf/config.json';
 export const STYLES_PATH = './src/conf/styles.json';
 

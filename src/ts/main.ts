@@ -37,12 +37,13 @@
  * @todo Add currently playing bar
  * @todo Add free music sources
   **/
-import Minimist     from 'minimist';
+import Minimist       from 'minimist';
 
-import * as Util    from './lib/util';
-import * as Icecast from './lib/icecast';
-import * as Radio   from './lib/radio';
-import Mplayer      from './lib/mplayer';
+import * as Util      from './lib/util';
+import * as Icecast   from './lib/icecast';
+import * as Shoutcast from './lib/shoutcast';
+import * as Radio     from './lib/radio';
+import Mplayer        from './lib/mplayer';
 
 import { State, Config, Entry } from './lib/interfaces';
 
@@ -258,7 +259,7 @@ function query_streams(s :State, search :string) : Promise<Entry[]> {
       return Icecast.search_xiph(search);
     }
     case 'Shoutcast': {
-      return Icecast.search_shoutcast(search);
+      return Shoutcast.search_shoutcast(search);
     }
     case 'Radio': {
       // Parse mode
@@ -380,7 +381,12 @@ async function input_handler(s :State, line :string) :Promise<State> {
     s.comp.input.clearValue();
     const s2 = hide_input(s);
 
-    return await search_streams(s2, line);
+    if(line !== '') {
+      return await search_streams(s2, line);
+    }
+    else {
+      return s;
+    }
   }
 }
 
