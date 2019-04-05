@@ -5,10 +5,10 @@
   "description": "Simple terminal net stream player",
   "main": "src/js/main.js",
   "scripts": {
-    "start": "node src/js/main.js",
+    "start": "NETSTREAMS_ENV=test node src/js/main.js",
     "test": "mocha test/test.js || true",
     "build": "tsc",
-    "pkg": "pkg src/js/main.js -t node10-linux-x64 -o bin/main && cp src/conf bin -r",
+    "pkg": "pkg src/js/main.js -t node10-linux-x64 -o bin/netstreams && cp src/conf bin -r",
     "doc": "tsdoc"
   },
   "license": "GPL-3.0",

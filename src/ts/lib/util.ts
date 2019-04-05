@@ -9,14 +9,6 @@ import {
   StringJSON,
   AnyJSON } from './interfaces';
 
-// Test
-//export const CONFIG_PATH = '/etc/netstreams/config.json';
-//export const STYLES_PATH = '/etc/netstreams/styles.json';
-
-// Production
-export const CONFIG_PATH = './src/conf/config.json';
-export const STYLES_PATH = './src/conf/styles.json';
-
 /**
  * @description Read configuration file
  **/
@@ -31,11 +23,21 @@ export function read_json(path :string) :AnyJSON {
 }
 
 export function read_config() :AnyJSON {
-  return read_json(CONFIG_PATH);
+  const path = process.env.NETSTEAMS_ENV
+    && process.env.NETSTREAMS_ENV === 'test'
+      ? './src/conf/config.json'
+      : '/etc/netstreams/config.json';
+
+  return read_json(path);
 }
 
 export function read_styles() :AnyJSON {
-  return read_json(STYLES_PATH);
+  const path = process.env.NETSTEAMS_ENV
+    && process.env.NETSTREAMS_ENV === 'test'
+      ? './src/conf/styles.json'
+      : '/etc/netstreams/styles.json';
+
+  return read_json(path);
 }
 
 export function format_init_header(option :StringJSON) :string {

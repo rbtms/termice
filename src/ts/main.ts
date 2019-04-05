@@ -166,9 +166,10 @@ async function pause(s :State) :Promise<State> {
   
     // Update pause key text
     // Renders screen
-    set_header_title(s);
+    const s2 = set_flags(s, { is_paused: !s.flags.is_paused });
+    set_header_title(s2);
   
-    return set_flags(s, { is_paused: !s.flags.is_paused });
+    return s2;
   }
   else {
     return s;
