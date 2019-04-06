@@ -1,32 +1,22 @@
 # netstreams
 Simple terminal net stream player
 
-# Description
-
-# Install
-Netstreams is made with Nodejs, so it needs the Nodejs runtime in order to work.
-
-Download the repository somewhere you are comfortable.<br>
-It's better to create an alias on .bashrc if you are on linux/cygwin.
+![screenshot](https://user-images.githubusercontent.com/14959143/55666699-1e3e5c80-5842-11e9-9179-e5a21b567df3.png)
 
 # Usage
+See the help launching the program with -h
 
-    netstreams [ARGS]
-
-    Options:
-      -q: Query
-      -s: Source
+# Available stream directories
+- Icecast
+- Shoutcast
+- radio-browser
 
 # Bugs
 - Currently very slow on large lists
 
 # Configuration
 Currently, netstreams relies on Mplayer in order to work.
-<br>By defect, it looks on the bin folder for an executable file and falls back on the 'mplayer' command.
-<br>It is untested in OS other than Windows 10 so input on other systems would be apreciated.
-
-# Documentation
-Refer to http://nishinishi9999.github.io/netstreams/index.html
+<br>Mplayer path, key mappings and css styes can be set up at /etc/netstreams
 
 # License
 Copyright (c) 2018 Alvaro Fernandez
@@ -47,10 +37,10 @@ Copyright (c) 2018 Alvaro Fernandez
 The authors of every module used in this program.
 
 # Version
-v0.1
+v0.1.0
 
 # Author
-nishinishi9999 (Alvaro Fernandez)
+Alvaro Fernandez
 
 # Contact mail
-nishinishi9999 at gmail dot com
+nishinishi9999 at protonmail dot com
