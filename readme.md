@@ -5,7 +5,8 @@ Simple terminal icecast player
 ![Screenshot_20190406_131441](https://user-images.githubusercontent.com/14959143/55670094-92432980-586f-11e9-883d-2ba5629d73c3.png)
 
 # Usage
-See the help launching the program with -h
+Just launch it
+<br>For startup options, run the program with -h
 
 # Available stream directories
 - Icecast
