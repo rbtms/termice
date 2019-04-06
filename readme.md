@@ -19,7 +19,8 @@ Currently, termice relies on Mplayer in order to work
 <br>Mplayer path, key mappings and css styes can be set up at /etc/termice
 
 # Build
-Just run tsc in order to generate src/js folder
+- Install dependencies with npm i
+- Run tsc in order to generate src/js folder
 
 # License
 Copyright (c) 2019 Alvaro Fernandez
