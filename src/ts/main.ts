@@ -68,7 +68,7 @@ async function force_quit(s :State, smth :any) :Promise<void> {
  **/
 function print_usage_and_quit() :void {
   console.log(`
-Usage: netstreams [ARGS]
+Usage: termice [ARGS]
 
 Options
   -h: Show this help
