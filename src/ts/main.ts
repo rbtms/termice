@@ -251,9 +251,14 @@ function query_streams(s :State, search :string) : Promise<Entry[]> {
           case 'language': {
             return Radio.search_radio(subsearch, mode);
           }
-            // It isn't a valid mode
+          // It isn't a valid mode
           default: {
-            return query_streams(s, s.flags.last_search);
+            return new Promise( (resolve) => {
+              resolve([Util.error_entry(
+                'Not a valid mode: ' + mode,
+                s.flags.source
+              )]);
+            })
           }
         }
       }

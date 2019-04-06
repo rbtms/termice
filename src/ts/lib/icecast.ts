@@ -20,7 +20,7 @@ export function search_xiph(search :string) :Promise<Entry[]> {
 
     require('request')(options, (err :string, _ :any, body :string) => {
       if(err)
-        resolve( [error_entry(err)] );
+        resolve( [error_entry(err, 'Icecast')] );
       else
         resolve( parse_xiph(body) );
     });
@@ -39,7 +39,7 @@ function parse_xiph(body :string) :Entry[] {
     document = new JSDOM(body).window.document;
   }
   catch(err) {
-    return [error_entry('Couldn\'t parse XIPH')];
+    return [error_entry('Couldn\'t parse XIPH', 'Icecast')];
   }
 
   const rows = document

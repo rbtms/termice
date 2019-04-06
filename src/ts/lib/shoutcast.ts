@@ -23,7 +23,7 @@ export function search_shoutcast(search :string) :Promise<Entry[]> {
 
     require('request')(options, (err :string, _ :any, body :string) => {
       if(err) {
-        resolve( [ error_entry(err) ] );
+        resolve( [ error_entry(err, 'Shoutcast') ] );
       }
       else {
         try {
@@ -31,7 +31,7 @@ export function search_shoutcast(search :string) :Promise<Entry[]> {
           resolve( parse_shoutcast(json) );
         }
         catch(err) {
-          resolve([ error_entry(err) ]);
+          resolve([ error_entry(err, 'Shoutcast') ]);
         }
       }
     });

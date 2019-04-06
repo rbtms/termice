@@ -120,7 +120,7 @@ export function add_rows_padding(rows_header :string[], rows :string[][]) :strin
 /**
  * @description Entry for the case an error happens
  */
-export function error_entry(error :string) :Entry {
+export function error_entry(error :string, source = '') :Entry {
   return {
     name        : error,
     homepage    : '',
@@ -129,7 +129,7 @@ export function error_entry(error :string) :Entry {
     playing     : '',
     url         : '',
     bitrate     : '',
-    src         : '',
+    src         : source,
     is_playlist : false,
     entry       : ''
   };
