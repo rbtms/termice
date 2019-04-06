@@ -1,8 +1,8 @@
 {
-  "name": "netstreams",
+  "name": "termice",
   "author": "Alvaro Fernandez nishinishi9999@protonmail.com",
   "version": "0.1.0",
-  "description": "Simple terminal net stream player",
+  "description": "Simple terminal icecast player",
   "main": "src/js/main.js",
   "scripts": {
     "start": "NETSTREAMS_ENV=test node src/js/main.js",

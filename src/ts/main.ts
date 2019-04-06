@@ -2,7 +2,7 @@
  * @fileOverview main.ts
  * @author       Alvaro Fernandez {@link https://github.com/robotoms}
  * @version      0.1.0
- * @description  Simple terminal net stream player
+ * @description  Simple terminal icecast player
  * @license
  * Copyright (c) 2019 Alvaro Fernandez
  * This program is free software: you can redistribute it and/or modify

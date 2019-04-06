@@ -15,7 +15,7 @@ See the help launching the program with -h
 - Currently very slow on large lists
 
 # Configuration
-Currently, netstreams relies on Mplayer in order to work.
+Currently, netstreams relies on Mplayer in order to work
 <br>Mplayer path, key mappings and css styes can be set up at /etc/netstreams
 
 # Build
@@ -37,7 +37,7 @@ Copyright (c) 2019 Alvaro Fernandez
 <br>along with this program.  If not, see {@link https://www.gnu.org/licenses/}.
 
 # Special thanks
-The authors of every module used in this program.
+The authors of every module used in this program
 
 # Version
 v0.1.0
