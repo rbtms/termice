@@ -24,7 +24,6 @@
     "@types/jsdom": "^12.2.3",
     "@types/jsonfile": "^4.0.1",
     "@types/minimist": "^1.2.0",
-    "@types/request": "^2.47.0",
-    "mocha": "^6.0.2"
+    "@types/request": "^2.47.0"
   }
 }
