@@ -1,5 +1,5 @@
 # netstreams
-Simple terminal net stream player
+Simple terminal icecast player
 
 ![screenshot](https://user-images.githubusercontent.com/14959143/55666699-1e3e5c80-5842-11e9-9179-e5a21b567df3.png)
 
