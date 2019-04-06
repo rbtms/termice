@@ -22,6 +22,9 @@ export function read_json(path :string) :AnyJSON {
   }
 }
 
+/**
+ * @description Read configuration file;
+ */
 export function read_config() :AnyJSON {
   const path = process.env.NETSTEAMS_ENV
     && process.env.NETSTREAMS_ENV === 'test'
@@ -31,6 +34,9 @@ export function read_config() :AnyJSON {
   return read_json(path);
 }
 
+/**
+ * @description Read blessed style file
+ */
 export function read_styles() :AnyJSON {
   const path = process.env.NETSTEAMS_ENV
     && process.env.NETSTREAMS_ENV === 'test'
@@ -40,6 +46,9 @@ export function read_styles() :AnyJSON {
   return read_json(path);
 }
 
+/**
+ * @description Format initial header
+ */
 export function format_init_header(option :StringJSON) :string {
   const def_style = '{white-bg}{black-fg}';
   const pad = ' ';
@@ -113,6 +122,9 @@ export function add_rows_padding(rows_header :string[], rows :string[][]) :strin
   );
 }
 
+/**
+ * @description Entry for the case an error happens
+ */
 export function error_entry(error :string) :Entry {
   return {
     name        : error,
@@ -128,6 +140,9 @@ export function error_entry(error :string) :Entry {
   };
 }
 
+/**
+ * @description Format and pad bitrate column
+ */
 function format_bitrate(bitrate :string) :string {
   const bitrate_pad = '   ';
   const pad     = bitrate_pad.substr(bitrate.length);
@@ -158,6 +173,12 @@ function format_icecast_list(rows_header :string[], list :Entry[]) :string[][] {
   ]));
 }
 
+/**
+ * @description Format shoutcast entries into stream_table rows
+ * @param rows_header Header
+ * @param list        Icecast entry list
+ * @return Formatted table rows
+ **/
 function format_shoutcast_list(rows_header :string[], list :Entry[]) :string[][] {
   const char_limit = {
     name: 30,
