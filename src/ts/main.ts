@@ -249,7 +249,7 @@ function query_streams(s :State, search :string) : Promise<Entry[]> {
           case 'tag':
           case 'country':
           case 'language': {
-            return Radio.search_radio(mode, subsearch);
+            return Radio.search_radio(subsearch, mode);
           }
             // It isn't a valid mode
           default: {

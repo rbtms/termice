@@ -25,20 +25,20 @@ const MODE_URL :StringJSON = {
  **/
 export function search_radio(search :string, mode :string) :Promise<Entry[]> {
   return new Promise( (resolve, reject) => {
-
     const options = {
       method : 'GET',
       url    : (MODE_URL[mode] || MODE_URL[DEF_MODE]) + search.split(' ').join('+')
     };
 
     require('request')(options, (err :string, _ :any, body :string) => {
-      if(err) reject(err);
-
-      const json = JSON.parse(body);
-
-      resolve( parse_radio(json) );
+      if(err) {
+        reject(err);
+      }
+      else {
+        const json = JSON.parse(body);
+        resolve( parse_radio(json) );
+      }
     });
-
   });
 }
 
