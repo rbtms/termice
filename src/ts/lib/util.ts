@@ -9,6 +9,11 @@ import {
   StringJSON,
   AnyJSON } from './interfaces';
 
+const CONF_PATH = process.env.TERMICE_ENV
+  && process.env.TERMICE_ENV == 'test'
+    ? './src/conf/'
+    : '/etc/termice/';
+
 /**
  * @description Read configuration file
  **/
@@ -26,24 +31,14 @@ export function read_json(path :string) :AnyJSON {
  * @description Read configuration file;
  */
 export function read_config() :AnyJSON {
-  const path = process.env.NETSTEAMS_ENV
-    && process.env.NETSTREAMS_ENV === 'test'
-      ? './src/conf/config.json'
-      : '/etc/netstreams/config.json';
-
-  return read_json(path);
+  return read_json(CONF_PATH + 'config.json');
 }
 
 /**
  * @description Read blessed style file
  */
 export function read_styles() :AnyJSON {
-  const path = process.env.NETSTEAMS_ENV
-    && process.env.NETSTREAMS_ENV === 'test'
-      ? './src/conf/styles.json'
-      : '/etc/netstreams/styles.json';
-
-  return read_json(path);
+  return read_json(CONF_PATH + 'styles.json');
 }
 
 /**
