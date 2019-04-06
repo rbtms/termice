@@ -22,7 +22,7 @@ Currently, netstreams relies on Mplayer in order to work.
 Just run tsc in order to generate src/js folder
 
 # License
-Copyright (c) 2018 Alvaro Fernandez
+Copyright (c) 2019 Alvaro Fernandez
 <br>This program is free software: you can redistribute it and/or modify
 <br>it under the terms of the GNU General Public License as published by
 <br>the Free Software Foundation, either version 3 of the License, or
