@@ -1,4 +1,4 @@
-# netstreams
+# termice
 Simple terminal icecast player
 
 ![screenshot](https://user-images.githubusercontent.com/14959143/55666699-1e3e5c80-5842-11e9-9179-e5a21b567df3.png)
@@ -15,8 +15,8 @@ See the help launching the program with -h
 - Currently very slow on large lists
 
 # Configuration
-Currently, netstreams relies on Mplayer in order to work
-<br>Mplayer path, key mappings and css styes can be set up at /etc/netstreams
+Currently, termice relies on Mplayer in order to work
+<br>Mplayer path, key mappings and css styes can be set up at /etc/termice
 
 # Build
 Just run tsc in order to generate src/js folder
