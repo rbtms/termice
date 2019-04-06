@@ -1,6 +1,6 @@
 /**
  * @fileOverview main.ts
- * @author       Alvaro Fernandez {@link https://github.com/nishinishi9999}
+ * @author       Alvaro Fernandez {@link https://github.com/robotoms}
  * @version      0.1.0
  * @description  Simple terminal net stream player
  * @license
