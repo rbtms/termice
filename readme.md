@@ -17,7 +17,7 @@ See the help launching the program with -h
 
 # Configuration
 Currently, termice relies on Mplayer in order to work
-<br>Mplayer path, key mappings and css styes can be set up at /etc/termice
+<br>Mplayer path, intial query and css styes can be set up at /etc/termice
 
 # Build
 - Install dependencies with npm i

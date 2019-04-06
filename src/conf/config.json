@@ -1,6 +1,6 @@
 {
-  "default_search": "anime",
-  "default_source": "Radio",
+  "default_search": "metal",
+  "default_source": "Icecast",
 
   "pause_key": "Sp",
   "scroll_up_dist": 9,

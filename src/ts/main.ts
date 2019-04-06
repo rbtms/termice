@@ -22,6 +22,7 @@
  * ERROR
  * @todo Remove layout-breaking characters
  * @todo Scroll up near the first entry makes cursor to disappear
+ * @todo Invalid source arguments break the program on startup
  *
  * TODO
  * @todo Log errors
