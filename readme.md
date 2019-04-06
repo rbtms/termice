@@ -18,6 +18,9 @@ See the help launching the program with -h
 Currently, netstreams relies on Mplayer in order to work.
 <br>Mplayer path, key mappings and css styes can be set up at /etc/netstreams
 
+# Build
+Just run tsc in order to generate src/js folder
+
 # License
 Copyright (c) 2018 Alvaro Fernandez
 <br>This program is free software: you can redistribute it and/or modify
