@@ -1,6 +1,7 @@
 # termice
 Simple terminal icecast player
 
+![Screenshot_20190406_131441](https://user-images.githubusercontent.com/14959143/55670094-92432980-586f-11e9-883d-2ba5629d73c3.png)
 ![screenshot](https://user-images.githubusercontent.com/14959143/55666699-1e3e5c80-5842-11e9-9179-e5a21b567df3.png)
 
 # Usage
