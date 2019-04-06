@@ -42,6 +42,7 @@ import * as Util      from './lib/util';
 import * as Icecast   from './lib/icecast';
 import * as Shoutcast from './lib/shoutcast';
 import * as Radio     from './lib/radio';
+// ~20ms startup time
 import Mplayer        from './lib/mplayer';
 
 import { State, Config, Entry } from './lib/interfaces';
