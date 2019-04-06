@@ -1,7 +1,7 @@
 /**
  * @fileOverview main.ts
  * @author       Alvaro Fernandez {@link https://github.com/robotoms}
- * @version      0.1.0
+ * @version      1.0.0
  * @description  Simple terminal icecast player
  * @license
  * Copyright (c) 2019 Alvaro Fernandez

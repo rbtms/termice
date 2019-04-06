@@ -1,14 +1,14 @@
 {
   "name": "termice",
   "author": "Alvaro Fernandez nishinishi9999@protonmail.com",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Simple terminal icecast player",
   "main": "src/js/main.js",
   "scripts": {
     "start": "TERMICE_ENV=test node src/js/main.js",
     "build": "tsc -p .",
-    "pkg64": "pkg src/js/main.js -t node10-linux-x64 -o bin/termice && cp src/conf bin -r",
-    "pkg32": "pkg src/js/main.js -t node10-linux-x32 -o bin/termice && cp src/conf bin -r",
+    "pkg64": "pkg src/js/main.js -t node10-linux-x64 -o bin/termice64 && cp src/conf bin -r",
+    "pkg86": "pkg src/js/main.js -t node10-linux-x86 -o bin/termice86 && cp src/conf bin -r",
     "lint": "tslint src/ts/**/**"
   },
   "license": "GPL-3.0",
