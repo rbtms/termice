@@ -13,9 +13,6 @@ Just launch it
 - Shoutcast
 - radio-browser
 
-# Bugs
-- Currently very slow on large lists
-
 # Configuration
 Currently, termice relies on Mplayer in order to work
 <br>Mplayer path, intial query and css styes can be set up at /etc/termice
@@ -23,6 +20,10 @@ Currently, termice relies on Mplayer in order to work
 # Build
 - Install dependencies with npm i
 - Run tsc in order to generate src/js folder
+
+# Install
+Currently there are only .deb packages for install
+<br>You can use pkg in order to generate a binary for your platform
 
 # License
 Copyright (c) 2019 Alvaro Fernandez
@@ -42,11 +43,5 @@ Copyright (c) 2019 Alvaro Fernandez
 # Special thanks
 The authors of every module used in this program
 
-# Version
-v0.1.0
-
 # Author
-Alvaro Fernandez
-
-# Contact mail
-nishinishi9999 at protonmail dot com
+Alvaro Fernandez (nishinishi9999 at protonmail dot com)
