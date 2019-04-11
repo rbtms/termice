@@ -18,24 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see {@link https://www.gnu.org/licenses/}.
  *
- *
- * ERROR
- * @todo Remove layout-breaking characters
- * @todo Scroll up near the first entry makes cursor to disappear
- * @todo Invalid source arguments break the program on startup
- *
- * TODO
- * @todo Log errors
- * @todo Test file
- * @todo Add mplayer to deb dependencies
- * @todo Volume bar
- * @todo Add option to add non-selectable descriptions
- * @todo Improve performance on large lists
- *
- * IDEAS
- * @todo Update currently playing track information
- * @todo Add currently playing bar
- * @todo Add free music sources
   **/
 import Minimist       from 'minimist';
 
