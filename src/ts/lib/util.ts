@@ -2,7 +2,7 @@
  * Util
  * @module Util
  **/
-//import * as JsonFile from 'jsonfile';
+
 import {
   State,
   Entry,
@@ -10,7 +10,7 @@ import {
   AnyJSON } from './interfaces';
 
 const CONF_PATH = process.env.TERMICE_ENV
-  && process.env.TERMICE_ENV == 'test'
+  && process.env.TERMICE_ENV === 'test'
     ? './src/conf/'
     : '/etc/termice/';
 
@@ -19,8 +19,8 @@ const CONF_PATH = process.env.TERMICE_ENV
  **/
 export function read_json(path :string) :AnyJSON {
   try {
-    const json = require('jsonfile').readFileSync(path);
-    return json;
+    const file = require('fs').readFileSync(path);
+    return JSON.parse(file);
   }
   catch(err) {
     throw Error(`Couldn't load ${path}: ${err})`);

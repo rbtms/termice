@@ -15,15 +15,14 @@
   "dependencies": {
     "blessed": "^0.1.81",
     "jsdom": "^14.0.0",
-    "jsonfile": "^4.0.0",
     "minimist": "^1.2.0",
     "request": "^2.88.0"
   },
   "devDependencies": {
     "@types/blessed": "^0.1.10",
     "@types/jsdom": "^12.2.3",
-    "@types/jsonfile": "^4.0.1",
     "@types/minimist": "^1.2.0",
     "@types/request": "^2.47.0"
   }
 }
+
