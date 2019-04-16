@@ -43,5 +43,5 @@ Copyright (c) 2019 Alvaro Fernandez
 # Special thanks
 The authors of every module used in this program
 
-# Author
-Alvaro Fernandez (nishinishi9999 at protonmail dot com)
+# Contact mail
+nishinishi9999 at protonmail dot com
