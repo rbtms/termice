@@ -23,7 +23,7 @@ Currently, termice relies on Mplayer in order to work
 
 # Install
 `npm install termice -g`
-Alternatively there are .deb packages for debian based platforms
+<br>Alternatively there are .deb packages for debian based platforms
 
 # License
 Copyright (c) 2019 Alvaro Fernandez
