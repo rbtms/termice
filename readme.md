@@ -22,8 +22,8 @@ Currently, termice relies on Mplayer in order to work
 - Run tsc in order to generate src/js folder
 
 # Install
-Currently there are only .deb packages for install
-<br>You can use pkg in order to generate a binary for your platform
+`npm install termice -g`
+Alternatively there are .deb packages for debian based platforms
 
 # License
 Copyright (c) 2019 Alvaro Fernandez
