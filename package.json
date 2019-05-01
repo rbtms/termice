@@ -1,7 +1,7 @@
 {
   "name": "termice",
   "author": "Alvaro Fernandez nishinishi9999@protonmail.com",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "description": "Simple terminal icecast player",
   "main": "src/js/main.js",
   "scripts": {
@@ -12,7 +12,15 @@
   "bin": {
     "termice": "./src/js/main.js"
   },
-  "keywords": ["icecast", "shoutcast", "termice", "radio", "tui", "blessed", "terminal"],
+  "keywords": [
+    "icecast",
+    "shoutcast",
+    "termice",
+    "radio",
+    "tui",
+    "blessed",
+    "terminal"
+  ],
   "license": "GPL-3.0",
   "dependencies": {
     "blessed": "^0.1.81",

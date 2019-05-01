@@ -9,7 +9,7 @@ import {
   StringJSON,
   AnyJSON } from './interfaces';
 
-const CONF_PATH = './src/conf/'
+const CONF_PATH = __dirname.substr(0, __dirname.length - 6) + 'conf/';
 
 /**
  * @description Read configuration file
