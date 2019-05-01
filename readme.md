@@ -4,6 +4,10 @@ Simple terminal icecast player
 ![Screenshot_20190406_150249](https://user-images.githubusercontent.com/14959143/55671226-5020e480-587d-11e9-90be-a090ef096d98.png)
 ![Screenshot_20190406_131441](https://user-images.githubusercontent.com/14959143/55670094-92432980-586f-11e9-883d-2ba5629d73c3.png)
 
+# Install
+`npm install termice -g`
+<br>Alternatively there are .deb packages for debian based platforms
+
 # Usage
 Just launch it
 <br>For startup options, run the program with -h
@@ -20,10 +24,6 @@ Currently, termice relies on Mplayer in order to work
 # Build
 - Install dependencies with npm i
 - Run tsc in order to generate src/js folder
-
-# Install
-`npm install termice -g`
-<br>Alternatively there are .deb packages for debian based platforms
 
 # License
 Copyright (c) 2019 Alvaro Fernandez
