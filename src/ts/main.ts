@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /**
  * @fileOverview main.ts
  * @author       Alvaro Fernandez {@link https://github.com/robotoms}

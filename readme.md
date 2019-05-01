@@ -19,7 +19,8 @@ Just launch it
 
 # Configuration
 Currently, termice relies on Mplayer in order to work
-<br>Mplayer path, intial query and css styes can be set up at /etc/termice
+<br>Mplayer path, intial query and css styes can be set up at src/conf folder
+<br>or /etc/termice in the case of deb packages
 
 # Build
 - Install dependencies with npm i

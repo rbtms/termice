@@ -9,10 +9,7 @@ import {
   StringJSON,
   AnyJSON } from './interfaces';
 
-const CONF_PATH = process.env.TERMICE_ENV
-  && process.env.TERMICE_ENV === 'test'
-    ? './src/conf/'
-    : '/etc/termice/';
+const CONF_PATH = './src/conf/'
 
 /**
  * @description Read configuration file
