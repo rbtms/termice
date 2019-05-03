@@ -1,8 +1,12 @@
 {
   "name": "termice",
   "author": "Alvaro Fernandez nishinishi9999@protonmail.com",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Simple terminal icecast player",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/robotoms/termice"
+  },
   "main": "src/js/main.js",
   "scripts": {
     "start": "./src/js/main.js",
