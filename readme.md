@@ -9,7 +9,7 @@ Simple terminal icecast and internet radio stream player.
 ![Screenshot_20190406_131441](https://user-images.githubusercontent.com/14959143/55670094-92432980-586f-11e9-883d-2ba5629d73c3.png)
 
 ## Install
-`npm install termice -g`
+`npm install termice -g`<br>
 Or if you dont want to install it: `npx termice`
 <br>Alternatively there are .deb packages for debian based platforms
 
