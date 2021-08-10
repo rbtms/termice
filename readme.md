@@ -1,6 +1,6 @@
 # Termice
 
-Note: Current version might no longer work with some sources due to API changes.
+<b>Note</b>: Current version might no longer work with some sources due to API changes.
 
 ## Description
 Simple terminal icecast and internet radio stream player.
