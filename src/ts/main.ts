@@ -2,8 +2,8 @@
 
 /**
  * @fileOverview main.ts
- * @author       Alvaro Fernandez {@link https://github.com/robotoms}
- * @version      1.0.0
+ * @author       Alvaro Fernandez {@link https://github.com/rbtms}
+ * @version      1.1.0
  * @description  Simple terminal icecast player
  * @license
  * Copyright (c) 2019 Alvaro Fernandez
@@ -336,7 +336,7 @@ function hide_input(s :State) :State {
  **/
 async function input_handler(s :State, line :string) :Promise<State> {
   // Command
-  if(line === ':q') {
+  if(line === ':q' || line === ":Q" || line === ":quit" || line === ":exit") {
     await quit(s);
     return s;
   }
@@ -574,7 +574,7 @@ function init_state(config :Config, argv :any, styles :any) :State {
  * @description Main
  **/
 function main() :void {
-  const available_opts = ['h', 'q', 's', '_'];
+  const available_opts = ['h', 'q', 'Q', 's', '_'];
   const argv = Minimist(process.argv);
 
   if(

@@ -30,7 +30,7 @@ export function search_shoutcast(search :string) :Promise<Entry[]> {
           const json = JSON.parse(body);
           resolve( parse_shoutcast(json) );
         }
-        catch(err) {
+        catch(err :any) {
           resolve([ error_entry(err, 'Shoutcast') ]);
         }
       }

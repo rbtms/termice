@@ -160,8 +160,8 @@ function format_icecast_list(rows_header :string[], list :Entry[]) :string[][] {
     entry.name.substr       (0, char_limit.name),
     entry.playing.substr    (0, char_limit.playing),
     //description.substr(0, char_limit.description),
-    entry.listeners.substr  (0, char_limit.listeners),
-    format_bitrate(entry.bitrate).substr(0, char_limit.bitrate)
+    entry.listeners.substr  (0, char_limit.listeners)
+    //format_bitrate(entry.bitrate).substr(0, char_limit.bitrate)
   ]));
 }
 

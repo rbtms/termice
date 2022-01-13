@@ -15,7 +15,7 @@ export function search_xiph(search :string) :Promise<Entry[]> {
   return new Promise( resolve => {
     const options = {
       method : 'GET',
-      url    : 'http://dir.xiph.org/search?search=' + search.split(' ').join('+')
+      url    : 'http://dir.xiph.org/search?q=' + search.split(' ').join('+')
     };
 
     require('request')(options, (err :string, _ :any, body :string) => {
@@ -32,7 +32,7 @@ function parse_xiph(body :string) :Entry[] {
   const JSDOM = require('jsdom').JSDOM;
 
   const host = 'http://dir.xiph.org';
-  const playing_pos = 25;
+  //const playing_pos = 25;
   let document;
 
   try {
@@ -42,53 +42,36 @@ function parse_xiph(body :string) :Entry[] {
     return [error_entry('Couldn\'t parse XIPH', 'Icecast')];
   }
 
-  const rows = document
-    .querySelector('body > #thepage > #content > .servers-list :nth-child(1)');
+  const rows = document.querySelectorAll('.card');
 
   if(rows === null)
     return [];
   else
-    return Array.from(rows.children).map( (entry :any) => {
-      const sel_name_hp     = entry.querySelector('.description > .stream-name > .name > a');
-      const sel_listeners   = entry.querySelector('.description > .stream-name > .listeners');
-      const sel_description = entry.querySelector('.description > .stream-description');
-      const sel_playing     = entry.querySelector('.description > .stream-onair');
-      const sel_url         = entry.querySelector('.tune-in > .format ~ p :nth-child(1)');
-      const sel_bitrate     = entry.querySelector('.tune-in > p ~ :last-child');
-
-      let bitrate;
-
-      if(sel_bitrate && sel_bitrate.title) {
-        const match = sel_bitrate.title.match(/\d+/);
-
-        if(sel_bitrate.title.includes('kbps') && match)
-          bitrate = match[0];
-        else
-          bitrate = '';
-      }
-      else {
-        bitrate = 'Null';
-      }
+    return Array.from(rows).map( (entry :any) => {
+      const sel_name_hp     = entry.querySelector('.card-title');
+      const sel_playing     = entry.querySelector('.card-subtitle'); //.innerHTML.substr(8);
+      const sel_description = entry.querySelector('.card-text');
+      const sel_url         = entry.querySelector('.card-footer > div :last-child'); //.href;
+      const sel_listeners   = entry.querySelector('.card-footer'); //.textContent.trim().split(" ")[0]);
 
       // TODO: Write this more robustly
       return {
         name        : sel_name_hp     ? sel_name_hp.innerHTML
           : 'Null',
-        homepage    : sel_name_hp     ? sel_name_hp.href
+        homepage    : 'Null',
+        listeners   : sel_listeners   ? sel_listeners.textContent.trim().split(' ')[0]
           : 'Null',
-        listeners   : sel_listeners   ? sel_listeners.innerHTML.split('&nbsp')[0].substr(1)
-          : 'Null',
-        description : sel_description ? sel_description.innerHTML
+        description : sel_description ? sel_description.innerHTML.trim()
           : '',
-        playing     : sel_playing     ? sel_playing.innerHTML.substr(playing_pos)
+        playing     : sel_playing     ? sel_playing.innerHTML.substr(8)//.substr(playing_pos)
           : '',
         url         : sel_url         ? host + sel_url.href
           : 'Null',
-        bitrate,
+        bitrate     : 'Null',
         src         : 'Icecast',
         is_playlist : true,
         entry       : entry.innerHTML
       };
-    });
+    }).sort((entry1, entry2) => entry2.listeners - entry1.listeners);
 }
 

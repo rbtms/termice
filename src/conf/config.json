@@ -44,7 +44,7 @@
   },
 
   "table_headers": {
-    "Icecast" : ["Name", "Playing", "Listeners", "Bitrate"],
+    "Icecast" : ["Name", "Playing", "Listeners"],
     "Shoutcast" : ["Name", "Playing", "Listeners", "Bitrate"],
     "Radio": ["Name", "Bitrate"]
   },

@@ -3,18 +3,13 @@
  * @module Radio
  **/
 //import {default as request} from 'request';
-import { Entry, StringJSON, AnyJSON } from './interfaces';
+import { Entry, AnyJSON } from './interfaces';
 
 
 const DEF_MODE = 'name';
 
-const MODE_URL :StringJSON = {
-  name     : 'http://www.radio-browser.info/webservice/json/stations/byname/',
-  tag      : 'http://www.radio-browser.info/webservice/json/stations/bytag/',
-  country  : 'http://www.radio-browser.info/webservice/json/stations/bycountry/',
-  language : 'http://www.radio-browser.info/webservice/json/stations/bylanguage/'
-};
-
+const BASE_URL = 'http://all.api.radio-browser.info/json/stations/search'
+const MODES = ['name', 'tag', 'country', 'language']
 
 /**
  * @method search_radio
@@ -24,10 +19,14 @@ const MODE_URL :StringJSON = {
  * @return Stream list promise
  **/
 export function search_radio(search :string, mode :string) :Promise<Entry[]> {
+  if( !MODES.includes(mode) ) {
+      mode = DEF_MODE;
+  }
+
   return new Promise( (resolve, reject) => {
     const options = {
       method : 'GET',
-      url    : (MODE_URL[mode] || MODE_URL[DEF_MODE]) + search.split(' ').join('+')
+      url    : BASE_URL + "?" + mode + "=" + search.split(' ').join('+')
     };
 
     require('request')(options, (err :string, _ :any, body :string) => {

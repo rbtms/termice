@@ -1,7 +1,5 @@
 # Termice
 
-<b>Note</b>: Current version might no longer work with some sources due to API changes.
-
 ## Description
 Simple terminal icecast and internet radio stream player.
 
@@ -31,7 +29,8 @@ Currently, termice relies on Mplayer in order to work
 
 ## Build
 - Install dependencies with npm i
-- Run tsc in order to generate src/js folder
+- Build with npm run build
+- Run with npm run start
 
 ## License
 Copyright (c) 2019 Alvaro Fernandez
