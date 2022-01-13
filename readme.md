@@ -30,7 +30,7 @@ Currently, termice relies on Mplayer in order to work
 ## Build
 - Install dependencies with npm i
 - Build with npm run build
-- Run with npm run start
+- Run with npm start
 
 ## License
 Copyright (c) 2019 Alvaro Fernandez
