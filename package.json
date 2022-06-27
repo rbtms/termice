@@ -28,7 +28,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "blessed": "^0.1.81",
-    "jsdom": "^14.0.0",
+    "jsdom": "^16.5.0",
     "minimist": "^1.2.0",
     "request": "^2.88.0"
   },
